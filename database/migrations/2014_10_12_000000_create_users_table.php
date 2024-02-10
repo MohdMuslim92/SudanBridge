@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('phone');
             $table->bigInteger('role_id')->unsigned();
             $table->bigInteger('facility_id')->unsigned();
-            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
         });
