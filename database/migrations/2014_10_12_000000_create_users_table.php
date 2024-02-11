@@ -18,10 +18,14 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone');
-            $table->bigInteger('role_id')->unsigned();
-            $table->bigInteger('facility_id')->unsigned();
+            $table->bigInteger('role_id')->unsigned()->nullable();
+            $table->bigInteger('facility_id')->unsigned()->nullable();
             $table->rememberToken();
             $table->timestamps();
+
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+            $table->foreign('facility_id')->references('id')->on('facilities')->onDelete('cascade');
+
         });
     }
 
