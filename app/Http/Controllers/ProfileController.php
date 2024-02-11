@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Validation\Rules;
 
 class ProfileController extends Controller
 {
@@ -29,6 +30,12 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        $user = $request->user();
+        $user->fill([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'phone' => $request->input('phone'),
+        ]);
         $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
