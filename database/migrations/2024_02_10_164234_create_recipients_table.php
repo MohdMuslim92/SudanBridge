@@ -17,9 +17,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone');
             $table->bigInteger('address_id')->unsigned();
+            $table->bigInteger('near_facility_id')->unsigned();
             $table->timestamps();
 
             $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
+            $table->foreign('near_facility_id')->references('id')->on('facilities')->onDelete('cascade');
         });
     }
 
