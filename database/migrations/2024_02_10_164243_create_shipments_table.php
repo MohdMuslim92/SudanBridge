@@ -19,7 +19,6 @@ return new class extends Migration
             $table->bigInteger('address_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
             $table->string('tracking_token');
-            $table->string('current_location');
             $table->timestamps();
 
             $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');
