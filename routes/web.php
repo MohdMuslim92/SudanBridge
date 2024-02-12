@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ShipmentsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,4 +43,13 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/dashboard/data', [DashboardController::class, 'data']);
 Route::post('/dashboard/update/{userId}', [DashboardController::class, 'updateUserRole']);
+
+Route::middleware('auth')->group(function () {
+    // Routes for managing shipments
+    Route::get('/api/shipments', [ShipmentsController::class, 'index']);
+    Route::post('/api/shipments', [ShipmentsController::class, 'store']);
+    Route::put('/api/shipments/{id}', [ShipmentsController::class, 'update']);
+    Route::delete('/api/shipments/{id}', [ShipmentsController::class, 'destroy']);
+});
+
 require __DIR__.'/auth.php';
