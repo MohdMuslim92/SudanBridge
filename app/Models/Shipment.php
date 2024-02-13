@@ -17,10 +17,28 @@ class Shipment extends Model
         'item_id',
         'sender_id',
         'recipient_id',
-        'address_id',
         'user_id',
         'tracking_token',
-        'current_location',
     ];
 
+    public function item()
+    {
+        return $this->hasOne(Item::class);
+    }
+    public function sender()
+    {
+        return $this->hasOne(Sender::class);
+    }
+    public function recipient()
+    {
+        return $this->hasOne(Recipient::class);
+    }
+    public function address()
+    {
+        return $this->hasOne(Address::class);
+    }
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
 }
