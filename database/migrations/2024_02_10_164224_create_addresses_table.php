@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('street');
             $table->string('city');
             $table->string('state');
-            $table->string('country');
+            $table->string('country')->default('Sudan'); // Set default value to 'Sudan'
             $table->text('details');
             $table->timestamps();
         });
