@@ -16,15 +16,15 @@ return new class extends Migration
             $table->bigInteger('item_id')->unsigned();
             $table->bigInteger('sender_id')->unsigned();
             $table->bigInteger('recipient_id')->unsigned();
-            $table->bigInteger('address_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
+            $table->BigInteger('status_id')->unsigned()->default(1); // Set default value to 1
             $table->string('tracking_token');
             $table->timestamps();
 
             $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');
             $table->foreign('sender_id')->references('id')->on('senders')->onDelete('cascade');
             $table->foreign('recipient_id')->references('id')->on('recipients')->onDelete('cascade');
-            $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
+            $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
         });
