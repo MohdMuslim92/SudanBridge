@@ -5,6 +5,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 const shipments = ref([]);
+const facilitiesResponse = ref([]);
 
 const form = useForm({
     itemName: '',
@@ -35,6 +36,16 @@ onMounted(async () => {
     } catch (error) {
         console.error('Error fetching data:', error);
     }
+
+    try {
+        // Fetch facilities
+        const facilities = await axios.get('/api/facilities');
+        facilitiesResponse.value = facilities.data;
+        console.log(facilitiesResponse.value);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+
 });
 
 // Function to add a new shipment
@@ -172,8 +183,10 @@ const deleteShipment = async (shipmentId) => {
                         <label for="recipientNearFacility" class="block text-gray-700 text-sm font-bold mb-2">Recipient Near Facility</label>
                         <!-- Dropdown menu for recipient near facility -->
                         <select id="recipientNearFacility" v-model="form.recipientNearFacility" class="form-select w-full">
-                            <option value="facility1">Facility 1</option>
-                            <option value="facility2">Facility 2</option>
+                            <!-- Loop through the facilities and generate options dynamically -->
+                            <option v-for="facility in facilitiesResponse" :key="facility.id" :value="facility.id">
+                                {{ facility.name }} - {{ facility.location }}
+                            </option>
                         </select>
                     </div>
                     <div class="mb-4">
