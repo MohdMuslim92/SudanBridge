@@ -7,6 +7,25 @@ use App\Models\Facility;
 
 class FacilityController extends Controller
 {
+    /**
+     * Display a listing of the facilities.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index()
+    {
+        try {
+            // Fetch facilities from the database
+            $facilities = Facility::all();
+
+            // Return facilities as JSON response
+            return response()->json($facilities);
+        } catch (\Exception $e) {
+            // Handle any errors and return an error response
+            return response()->json(['error' => 'Failed to fetch facilities.'], 500);
+        }
+    }
+
     public function update(Request $request, Facility $facility)
     {
         $request->validate([

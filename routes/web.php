@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ShipmentsController;
+use App\Http\Controllers\FacilityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/dashboard/data', [DashboardController::class, 'data']);
 Route::post('/dashboard/update/{userId}', [DashboardController::class, 'updateUserRole']);
+Route::post('/dashboard/updateFacility/{userId}', [DashboardController::class, 'updateFacility']);
 
 Route::middleware('auth')->group(function () {
     // Routes for managing shipments
@@ -50,6 +52,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/shipments', [ShipmentsController::class, 'store']);
     Route::put('/api/shipments/{id}', [ShipmentsController::class, 'update']);
     Route::delete('/api/shipments/{id}', [ShipmentsController::class, 'destroy']);
+});
+
+// Route for fetching facilities
+Route::middleware('auth')->group(function () {
+    Route::get('/api/facilities', [FacilityController::class, 'index']);
 });
 
 require __DIR__.'/auth.php';
