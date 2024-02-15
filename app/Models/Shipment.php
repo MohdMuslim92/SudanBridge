@@ -23,22 +23,21 @@ class Shipment extends Model
 
     public function item()
     {
-        return $this->hasOne(Item::class);
+        return $this->belongsTo(Item::class);
     }
+
     public function sender()
     {
-        return $this->hasOne(Sender::class);
+        return $this->belongsTo(Sender::class);
     }
+
     public function recipient()
     {
-        return $this->hasOne(Recipient::class);
+        return $this->belongsTo(Recipient::class);
     }
-    public function address()
-    {
-        return $this->hasOne(Address::class);
-    }
+
     public function user()
     {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class);
     }
 }

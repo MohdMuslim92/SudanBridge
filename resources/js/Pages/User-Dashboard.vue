@@ -33,6 +33,7 @@ onMounted(async () => {
         // Fetch shipments associated with the user
         const response = await axios.get('/api/shipments');
         shipments.value = response.data;
+        console.log(shipments.value);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -198,10 +199,19 @@ const deleteShipment = async (shipmentId) => {
                 <h3>My Shipments</h3>
                 <ul>
                     <li v-for="shipment in shipments" :key="shipment.id">
-                        {{ shipment.name }} - {{ shipment.status }}
+                        <div>
+                            <span><strong>Shipment ID:</strong> {{ shipment.id }}</span><br>
+                            <span><strong>Item Name:</strong> {{ shipment.item.name }}</span><br>
+                            <span><strong>Sender Name:</strong> {{ shipment.sender.name }}</span><br>
+                            <span><strong>Recipient Name:</strong> {{ shipment.recipient.name }}</span><br>
+                            <span><strong>Facility:</strong> {{ shipment.recipient.facility ? shipment.recipient.facility.location : 'N/A' }}</span><br>
+                            <span><strong>Tracking Token:</strong> {{ shipment.tracking_token }}</span>
+                        </div>
                         <!-- Buttons to update status and delete shipment -->
-                        <button @click="updateShipmentStatus(shipment.id)">Update Status</button>
-                        <button @click="deleteShipment(shipment.id)">Delete</button>
+                        <div>
+                            <button @click="updateShipmentStatus(shipment.id)">Update Status</button>
+                            <button @click="deleteShipment(shipment.id)">Delete</button>
+                        </div>
                     </li>
                 </ul>
             </div>

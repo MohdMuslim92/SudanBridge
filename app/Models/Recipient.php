@@ -24,11 +24,10 @@ class Recipient extends Model
 
     public function address()
     {
-        return $this->hasOne(Address::class);
+        return $this->belongsTo(Address::class);
     }
-
     public function facility()
     {
-        return $this->hasOne(Facility::class);
+        return $this->belongsTo(Facility::class, 'near_facility_id');
     }
 }
