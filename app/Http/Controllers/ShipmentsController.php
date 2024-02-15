@@ -14,11 +14,17 @@ class ShipmentsController extends Controller
 {
     public function index()
     {
-        // Retrieve all shipments
-        $shipments = Shipment::all();
+        // Retrieve all shipments with related data
+        $shipments = Shipment::with([
+            'item:id,name',
+            'sender:id,name',
+            'recipient:id,name,near_facility_id',
+            'recipient.facility:id,location'])->get();
+
+        \Log::info($shipments);
+        // Return the processed shipments data as a JSON response
         return response()->json($shipments);
     }
-
     public function store(Request $request)
     {
         // Generate a tracking token
@@ -44,7 +50,7 @@ class ShipmentsController extends Controller
             'recipientCity' => 'required|string',
             'recipientStreet' => 'required|string',
             'recipientAddressDetails' => 'nullable|string',
-            'recipientNearFacility' => 'required|string',
+            'recipientNearFacility' => 'required|numeric',
         ]);
 
         // Create an address for the sender
