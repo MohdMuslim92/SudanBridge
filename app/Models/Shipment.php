@@ -7,6 +7,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class Shipment extends Model
 {
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Listen for the deleting event
+        static::deleting(function ($shipment) {
+            // Manually delete related records from other tables
+
+            // Delete the sender's address
+            $shipment->sender->address()->delete();
+
+            // Delete the recipient's address
+            $shipment->recipient->address()->delete();
+
+            // Delete the related item record
+            $shipment->item()->delete();
+
+            // Delete the related sender record
+            $shipment->sender()->delete();
+
+            // Delete the related recipient record
+            $shipment->recipient()->delete();
+
+        });
+    }
+
     use HasFactory;
     /**
      * The attributes that are mass assignable.
