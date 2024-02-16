@@ -16,12 +16,15 @@ class ShipmentsController extends Controller
     {
         // Retrieve all shipments with related data
         $shipments = Shipment::with([
-            'item:id,name',
-            'sender:id,name',
-            'recipient:id,name,near_facility_id',
-            'recipient.facility:id,location'])->get();
+            'item',
+            'sender',
+            'sender.address',
+            'recipient',
+            'recipient.address',
+            'recipient.facility'
+        ])->get();
 
-        \Log::info($shipments);
+//        \Log::info($shipments);
         // Return the processed shipments data as a JSON response
         return response()->json($shipments);
     }
@@ -113,14 +116,64 @@ class ShipmentsController extends Controller
 
         // Validate incoming request data
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'item.name' => 'required|string',
+            'item.description' => 'required|string',
+            'sender.name' => 'required|string',
+            'sender.email' => 'required|email',
+            'sender.phone' => 'required|string',
+            'sender.address.street' => 'required|string',
+            'sender.address.city' => 'required|string',
+            'sender.address.state' => 'required|string',
+            'sender.address.details' => 'required|string',
+            'recipient.name' => 'required|string',
+            'recipient.email' => 'required|email',
+            'recipient.phone' => 'required|string',
+            'recipient.address.details' => 'required|string',
+            'recipient.address.street' => 'required|string',
+            'recipient.address.city' => 'required|string',
+            'recipient.address.state' => 'required|string',
+            'recipient.near_facility_id' => 'required|numeric',
         ]);
 
-        // Update the shipment
-        $shipment->update($validatedData);
+        // Update the item
+        $shipment->item->update([
+            'name' => $validatedData['item']['name'],
+            'description' => $validatedData['item']['description'],
+        ]);
 
-        return response()->json($shipment, 200);
+        // Update the sender
+        $shipment->sender->update([
+            'name' => $validatedData['sender']['name'],
+            'email' => $validatedData['sender']['email'],
+            'phone' => $validatedData['sender']['phone'],
+        ]);
+
+        // Update the sender's address
+        $shipment->sender->address->update([
+            'street' => $validatedData['sender']['address']['street'],
+            'city' => $validatedData['sender']['address']['city'],
+            'state' => $validatedData['sender']['address']['state'],
+            'details' => $validatedData['sender']['address']['details'],
+        ]);
+
+        // Update the recipient
+        $shipment->recipient->update([
+            'name' => $validatedData['recipient']['name'],
+            'email' => $validatedData['recipient']['email'],
+            'phone' => $validatedData['recipient']['phone'],
+            'near_facility_id' => $validatedData['recipient']['near_facility_id'],
+        ]);
+
+        // Update the recipient's address
+        $shipment->recipient->address->update([
+            'street' => $validatedData['recipient']['address']['street'],
+            'city' => $validatedData['recipient']['address']['city'],
+            'state' => $validatedData['recipient']['address']['state'],
+            'details' => $validatedData['recipient']['address']['details'],
+        ]);
+
+        // Return a response
+        return response()->json(['message' => 'Shipment updated successfully'], 200);
     }
 
     public function destroy($id)
