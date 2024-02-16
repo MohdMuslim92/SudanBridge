@@ -1,4 +1,12 @@
 <script setup>
+const script1 = document.createElement('script');
+script1.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+document.head.appendChild(script1);
+
+const script2 = document.createElement('script');
+script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js';
+document.head.appendChild(script2);
+import 'jquery';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
@@ -6,6 +14,16 @@ import axios from 'axios';
 
 const shipments = ref([]);
 const facilitiesResponse = ref([]);
+const modalShipment = ref(null)
+const states = ref([
+    { id: 1, name: 'state1' },
+    { id: 2, name: 'state2' }
+]);
+const cities = ref([
+    { id: 1, name: 'city1' },
+    { id: 2, name: 'city2' }
+]);
+
 
 const form = useForm({
     itemName: '',
@@ -42,11 +60,9 @@ onMounted(async () => {
         // Fetch facilities
         const facilities = await axios.get('/api/facilities');
         facilitiesResponse.value = facilities.data;
-        console.log(facilitiesResponse.value);
-    } catch (error) {
+        } catch (error) {
         console.error('Error fetching data:', error);
     }
-
 });
 
 // Function to add a new shipment
@@ -72,19 +88,81 @@ const addShipment = async () => {
     }
 };
 
-// Function to update the status of a shipment
-const updateShipmentStatus = async (shipmentId) => {
-    // Logic to update the status of a shipment
+// Function to open shipment details modal
+const openShipmentDetailsModal = (shipment) => {
+    modalShipment.value = shipment;
+    $('#shipmentDetailsModal').modal('show'); // Manually trigger the Bootstrap modal
 };
-
 // Function to delete a shipment
 const deleteShipment = async (shipmentId) => {
-    // Logic to delete a shipment
+    // Show confirmation dialog
+    const isConfirmed = confirm("Are you sure you want to delete this shipment?");
+
+    // If user confirms deletion
+    if (isConfirmed) {
+        try {
+            // Make an HTTP request to delete the shipment
+            await axios.delete(`/api/shipments/${shipmentId}`);
+
+            // Show notification
+            showNotification("Shipment deleted successfully");
+
+            // Refetch shipments after deletion
+            const response = await axios.get('/api/shipments');
+            shipments.value = response.data;
+        } catch (error) {
+            console.error('Error deleting shipment:', error);
+            // Show an error message
+            alert("Error deleting shipment. Please try again later.");
+        }
+    }
+};
+
+// Function to display a notification
+const showNotification = (message) => {
+    const notificationContainer = document.getElementById('notification-container');
+
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+
+    // Apply styles for notification
+    notification.style.backgroundColor = 'green'; // Green background
+    notification.style.color = 'white'; // White text
+    notification.style.fontWeight = 'bold'; // Bold text
+    notification.style.padding = '10px'; // Increase padding for a bigger box
+    // Append notification to container
+    notificationContainer.appendChild(notification);
+
+// Fade out and remove notification after 5 seconds
+    setTimeout(() => {
+        notification.classList.add('fade-out');
+        setTimeout(() => {
+            notification.remove();
+        }, 500); // Fading animation duration
+    }, 5000); // Notification display duration
+};
+
+// Function to save changes made to shipment details
+const saveChanges = async () => {
+    try {
+        // Make a request to update the shipment details
+        if (modalShipment.value) {
+            const response = await axios.put(`/api/shipments/${modalShipment.value.id}`, modalShipment.value);
+            console.log('Shipment details updated:', response.data);
+        } else {
+            console.error('No shipment selected.');
+        }
+    } catch (error) {
+        console.error('Error saving changes:', error);
+    }
 };
 </script>
 
 <template>
     <Head title="User Dashboard" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
     <AuthenticatedLayout>
         <template #header>
@@ -209,11 +287,89 @@ const deleteShipment = async (shipmentId) => {
                         </div>
                         <!-- Buttons to update status and delete shipment -->
                         <div>
-                            <button @click="updateShipmentStatus(shipment.id)">Update Status</button>
-                            <button @click="deleteShipment(shipment.id)">Delete</button>
+                            <!-- Use data-toggle and data-target attributes to trigger the modal -->
+                            <button @click="openShipmentDetailsModal(shipment)" class="btn btn-primary">Details/Update</button>
+                            <button @click="deleteShipment(shipment.id)" class="btn btn-danger">Delete</button>
+                            <div id="notification-container"></div>
+
                         </div>
                     </li>
                 </ul>
+                <!-- Modal for displaying shipment details -->
+                <div class="modal fade" id="shipmentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="shipmentDetailsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="shipmentDetailsModalLabel">Shipment Details</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" v-if="modalShipment">
+                                <!-- Display shipment details here -->
+                                <p><strong>Shipment ID:</strong> {{ modalShipment.id }}</p>
+                                <p><strong>Item Name:</strong> <input type="text" v-model="modalShipment.item.name"></p>
+                                <p><strong>Item Description:</strong> <input type="text" v-model="modalShipment.item.description"></p>
+                                <p><strong>Sender Name:</strong> <input type="text" v-model="modalShipment.sender.name"></p>
+                                <p><strong>Sender Email:</strong> <input type="text" v-model="modalShipment.sender.email"></p>
+                                <p><strong>Sender Phone:</strong> <input type="text" v-model="modalShipment.sender.phone"></p>
+                                <div>
+                                    <label for="state">Sender State:</label>
+                                    <select v-model="modalShipment.sender.address.state" id="state" class="form-select">
+                                        <option disabled value="">Select State</option>
+                                        <option v-for="state in states" :key="state.id" :value="state.name" :selected="state.name === modalShipment.sender.address.state">{{ state.name }}</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="city">Sender City:</label>
+                                    <select v-model="modalShipment.sender.address.city" id="city" class="form-select">
+                                        <option disabled value="">Select City</option>
+                                        <option v-for="city in cities" :key="city.id" :value="city.name" :selected="city.name === modalShipment.sender.address.city">{{ city.name }}</option>
+                                    </select>
+                                </div>
+                                <p><strong>Sender Street:</strong> <input type="text" v-model="modalShipment.sender.address.street"></p>
+                                <p><strong>Sender Address Details:</strong> <input type="text" v-model="modalShipment.sender.address.details"></p>
+                                <p><strong>Recipient Name:</strong> <input type="text" v-model="modalShipment.recipient.name"></p>
+                                <p><strong>Recipient Email:</strong> <input type="text" v-model="modalShipment.recipient.email"></p>
+                                <p><strong>Recipient Phone:</strong> <input type="text" v-model="modalShipment.recipient.phone"></p>
+                                <div>
+                                    <label for="state">Recipient State:</label>
+                                    <select v-model="modalShipment.recipient.address.state" id="state" class="form-select">
+                                        <option disabled value="">Select State</option>
+                                        <option v-for="state in states" :key="state.id" :value="state.name" :selected="state.name === modalShipment.recipient.address.state">{{ state.name }}</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="city">Recipient City:</label>
+                                    <select v-model="modalShipment.recipient.address.city" id="city" class="form-select">
+                                        <option disabled value="">Select City</option>
+                                        <option v-for="city in cities" :key="city.id" :value="city.name" :selected="city.name === modalShipment.recipient.address.city">{{ city.name }}</option>
+                                    </select>
+                                </div>
+                                <p><strong>Recipient Street:</strong> <input type="text" v-model="modalShipment.recipient.address.street"></p>
+                                <p><strong>Recipient Address Details:</strong> <input type="text" v-model="modalShipment.recipient.address.details"></p>
+                                <div>
+                                    <label for="facility">Facility: {{ modalShipment.recipient.facility.id }}</label>
+                                    <select v-model="modalShipment.recipient.facility" id="facility" class="form-select">
+                                        <option disabled value="">Select Facility</option>
+                                        <option v-for="facility in facilitiesResponse"
+                                                :key="facility.id"
+                                                :value="String(facility.id)"
+                                                :selected="String(facility.id) === String(modalShipment.recipient.facility.id)">
+                                            {{ facility.name }} - {{ facility.location }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <p><strong>Tracking Token:</strong> {{ modalShipment.tracking_token }}</p>
+                                <!-- Save button -->
+                                <button @click="saveChanges" class="btn btn-success">Save</button>
+                            </div>
+                            <div class="modal-body" v-else>
+                                Loading...
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </AuthenticatedLayout>
@@ -225,5 +381,26 @@ const deleteShipment = async (shipmentId) => {
     font-size: 24px;
     font-weight: bold;
     color: #333;
+}
+
+/* Add this CSS to your stylesheet or <style> tag */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.notification {
+    background-color: #4CAF50;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.5s ease-out;
+}
+
+.notification.fade-out {
+    opacity: 0;
 }
 </style>
