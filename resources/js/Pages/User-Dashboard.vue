@@ -45,6 +45,53 @@ const form = useForm({
     recipientNearFacility: ''
 });
 
+
+// Add data properties to control the visibility of add shipment sections
+const itemDetails = ref(false);
+const senderDetails = ref(false);
+const recipientDetails = ref(false);
+
+// Add data properties to control the visibility of sections in the modal
+const showItemDetails = ref(false);
+const showSenderDetails = ref(false);
+const showRecipientDetails = ref(false);
+
+// Function to toggle visibility of item details in add shipment section
+const toggleItem = () => {
+    itemDetails.value = !itemDetails.value;
+    senderDetails.value = false;
+    recipientDetails.value = false;
+};
+
+// Function to toggle visibility of sender details in add shipment section
+const toggleSender = () => {
+    senderDetails.value = !senderDetails.value;
+    itemDetails.value = false;
+    recipientDetails.value = false;
+};
+
+// Function to toggle visibility of recipient details in add shipment section
+const toggleRecipient = () => {
+    recipientDetails.value = !recipientDetails.value;
+    itemDetails.value = false;
+    senderDetails.value = false;
+};
+
+
+// Function to toggle visibility of item details section
+const toggleItemDetails = () => {
+    showItemDetails.value = !showItemDetails.value;
+};
+
+// Function to toggle visibility of sender details section
+const toggleSenderDetails = () => {
+    showSenderDetails.value = !showSenderDetails.value;
+};
+
+// Function to toggle visibility of recipient details section
+const toggleRecipientDetails = () => {
+    showRecipientDetails.value = !showRecipientDetails.value;
+};
 // Fetch user data and shipments on component mount
 onMounted(async () => {
     try {
@@ -73,7 +120,7 @@ const addShipment = async () => {
                 form.reset();
                 // Fetch updated shipment list
                 try {
-                    const response = await axios.get('/api/shipments'); // Now you can use await here
+                    const response = await axios.get('/api/shipments');
                     shipments.value = response.data;
                 } catch (error) {
                     console.error('Error fetching updated shipment list:', error);
@@ -158,6 +205,8 @@ const saveChanges = async () => {
         console.error('Error saving changes:', error);
     }
 };
+
+
 </script>
 
 <template>
@@ -175,105 +224,108 @@ const saveChanges = async () => {
             <div class="max-w-3xl w-full bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
 
                 <!-- Form to add a new shipment -->
+                <h3>Add a Shipment</h3>
                 <form @submit.prevent="addShipment">
-                    <div class="mb-4">
+                    <div class="bg-purple-300 rounded-md">
+                        <button @click="toggleItem" type="button" class="w-full bg-purple-500 text-white
+                                    text-left p-2 rounded-md mb-1 flex justify-between items-center">
+                            <span>Item Details</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-0 transition-transform" :class="{ 'rotate-180': showItemDetails }" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 12a1 1 0 0 1-1-1V7a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zM8 9a1 1 0 0 1 0-2h4a1 1 0 0 1 0 2H8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div v-show="itemDetails" class="border border-purple-500 rounded-md p-4">
                         <label for="itemName" class="block text-gray-700 text-sm font-bold mb-2">Item Name</label>
                         <input type="text" id="itemName" v-model="form.itemName" class="form-input w-full">
-                    </div>
-                    <div class="mb-4">
                         <label for="itemDescription" class="block text-gray-700 text-sm font-bold mb-2">Item Description</label>
                         <textarea id="itemDescription" v-model="form.itemDescription" class="form-textarea w-full"></textarea>
                     </div>
-                    <div class="mb-4">
-                        <label for="senderName" class="block text-gray-700 text-sm font-bold mb-2">Sender Name</label>
-                        <input type="text" id="senderName" v-model="form.senderName" class="form-input w-full">
                     </div>
-                    <div class="mb-4">
-                        <label for="senderEmail" class="block text-gray-700 text-sm font-bold mb-2">Sender Email</label>
-                        <input type="email" id="senderEmail" v-model="form.senderEmail" class="form-input w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label for="senderPhone" class="block text-gray-700 text-sm font-bold mb-2">Sender Phone</label>
-                        <input type="text" id="senderPhone" v-model="form.senderPhone" class="form-input w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label for="senderState" class="block text-gray-700 text-sm font-bold mb-2">Sender State</label>
-                        <!-- Dropdown menu for sender state -->
-                        <select id="senderState" v-model="form.senderState" class="form-select w-full">
-                            <option value="state1">State 1</option>
-                            <option value="state2">State 2</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="senderCity" class="block text-gray-700 text-sm font-bold mb-2">Sender City</label>
-                        <!-- Dropdown menu for sender city -->
-                        <select id="senderCity" v-model="form.senderCity" class="form-select w-full">
-                            <option value="city1">City 1</option>
-                            <option value="city2">City 2</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="senderStreet" class="block text-gray-700 text-sm font-bold mb-2">Sender Street</label>
-                        <input type="text" id="senderStreet" v-model="form.senderStreet" class="form-input w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label for="senderAddressDetails" class="block text-gray-700 text-sm font-bold mb-2">Sender Address Details</label>
-                        <textarea id="senderAddressDetails" v-model="form.senderAddressDetails" class="form-textarea w-full"></textarea>
+                    <div class="bg-purple-300 rounded-md">
+                        <button @click="toggleSender" type="button" class="w-full bg-purple-500 text-white
+                                    text-left p-2 rounded-md mb-1 flex justify-between items-center">
+                            <span>Sender Details</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-0 transition-transform" :class="{ 'rotate-180': showItemDetails }" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 12a1 1 0 0 1-1-1V7a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zM8 9a1 1 0 0 1 0-2h4a1 1 0 0 1 0 2H8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div v-show="senderDetails" class="border border-purple-500 rounded-md p-4">
+                            <label for="senderName" class="block text-gray-700 text-sm font-bold mb-2">Sender Name</label>
+                            <input type="text" id="senderName" v-model="form.senderName" class="form-input w-full">
+                            <label for="senderEmail" class="block text-gray-700 text-sm font-bold mb-2">Sender Email</label>
+                            <input type="email" id="senderEmail" v-model="form.senderEmail" class="form-input w-full">
+                            <label for="senderPhone" class="block text-gray-700 text-sm font-bold mb-2">Sender Phone</label>
+                            <input type="text" id="senderPhone" v-model="form.senderPhone" class="form-input w-full">
+                            <label for="senderState" class="block text-gray-700 text-sm font-bold mb-2">Sender State</label>
+                            <!-- Dropdown menu for sender state -->
+                            <select id="senderState" v-model="form.senderState" class="form-select w-full">
+                                <option value="state1">State 1</option>
+                                <option value="state2">State 2</option>
+                            </select>
+                            <label for="senderCity" class="block text-gray-700 text-sm font-bold mb-2">Sender City</label>
+                            <!-- Dropdown menu for sender city -->
+                            <select id="senderCity" v-model="form.senderCity" class="form-select w-full">
+                                <option value="city1">City 1</option>
+                                <option value="city2">City 2</option>
+                            </select>
+                            <label for="senderStreet" class="block text-gray-700 text-sm font-bold mb-2">Sender Street</label>
+                            <input type="text" id="senderStreet" v-model="form.senderStreet" class="form-input w-full">
+                            <label for="senderAddressDetails" class="block text-gray-700 text-sm font-bold mb-2">Sender Address Details</label>
+                            <textarea id="senderAddressDetails" v-model="form.senderAddressDetails" class="form-textarea w-full"></textarea>
+                        </div>
                     </div>
 
                     <!-- Recipient Information -->
-                    <div class="mb-4">
-                        <label for="recipientName" class="block text-gray-700 text-sm font-bold mb-2">Recipient Name</label>
-                        <input type="text" id="recipientName" v-model="form.recipientName" class="form-input w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label for="recipientEmail" class="block text-gray-700 text-sm font-bold mb-2">Recipient Email</label>
-                        <input type="email" id="recipientEmail" v-model="form.recipientEmail" class="form-input w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label for="recipientPhone" class="block text-gray-700 text-sm font-bold mb-2">Recipient Phone</label>
-                        <input type="text" id="recipientPhone" v-model="form.recipientPhone" class="form-input w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label for="recipientState" class="block text-gray-700 text-sm font-bold mb-2">Recipient State</label>
-                        <!-- Dropdown menu for recipient state -->
-                        <select id="recipientState" v-model="form.recipientState" class="form-select w-full">
-                            <option value="state1">State 1</option>
-                            <option value="state2">State 2</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="recipientCity" class="block text-gray-700 text-sm font-bold mb-2">Recipient City</label>
-                        <!-- Dropdown menu for recipient city -->
-                        <select id="recipientCity" v-model="form.recipientCity" class="form-select w-full">
-                            <option value="city1">City 1</option>
-                            <option value="city2">City 2</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="recipientStreet" class="block text-gray-700 text-sm font-bold mb-2">Recipient Street</label>
-                        <input type="text" id="recipientStreet" v-model="form.recipientStreet" class="form-input w-full">
-                    </div>
-                    <div class="mb-4">
-                        <label for="recipientAddressDetails" class="block text-gray-700 text-sm font-bold mb-2">Recipient Address Details</label>
-                        <textarea id="recipientAddressDetails" v-model="form.recipientAddressDetails" class="form-textarea w-full"></textarea>
-                    </div>
-                    <div class="mb-4">
-                        <label for="recipientNearFacility" class="block text-gray-700 text-sm font-bold mb-2">Recipient Near Facility</label>
-                        <!-- Dropdown menu for recipient near facility -->
-                        <select id="recipientNearFacility" v-model="form.recipientNearFacility" class="form-select w-full">
-                            <!-- Loop through the facilities and generate options dynamically -->
-                            <option v-for="facility in facilitiesResponse" :key="facility.id" :value="facility.id">
-                                {{ facility.name }} - {{ facility.location }}
-                            </option>
-                        </select>
+                    <div class="bg-purple-300 rounded-md">
+                        <button @click="toggleRecipient" type="button" class="w-full bg-purple-500 text-white
+                                    text-left p-2 rounded-md mb-1 flex justify-between items-center">
+                            <span>Recipient Details</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-0 transition-transform" :class="{ 'rotate-180': showItemDetails }" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 12a1 1 0 0 1-1-1V7a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zM8 9a1 1 0 0 1 0-2h4a1 1 0 0 1 0 2H8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div v-show="recipientDetails" class="border border-purple-500 rounded-md p-4">
+                            <label for="recipientName" class="block text-gray-700 text-sm font-bold mb-2">Recipient Name</label>
+                            <input type="text" id="recipientName" v-model="form.recipientName" class="form-input w-full">
+                            <label for="recipientEmail" class="block text-gray-700 text-sm font-bold mb-2">Recipient Email</label>
+                            <input type="email" id="recipientEmail" v-model="form.recipientEmail" class="form-input w-full">
+                            <label for="recipientPhone" class="block text-gray-700 text-sm font-bold mb-2">Recipient Phone</label>
+                            <input type="text" id="recipientPhone" v-model="form.recipientPhone" class="form-input w-full">
+                            <label for="recipientState" class="block text-gray-700 text-sm font-bold mb-2">Recipient State</label>
+                            <!-- Dropdown menu for recipient state -->
+                            <select id="recipientState" v-model="form.recipientState" class="form-select w-full">
+                                <option value="state1">State 1</option>
+                                <option value="state2">State 2</option>
+                            </select>
+                            <label for="recipientCity" class="block text-gray-700 text-sm font-bold mb-2">Recipient City</label>
+                            <!-- Dropdown menu for recipient city -->
+                            <select id="recipientCity" v-model="form.recipientCity" class="form-select w-full">
+                                <option value="city1">City 1</option>
+                                <option value="city2">City 2</option>
+                            </select>
+                            <label for="recipientStreet" class="block text-gray-700 text-sm font-bold mb-2">Recipient Street</label>
+                            <input type="text" id="recipientStreet" v-model="form.recipientStreet" class="form-input w-full">
+                            <label for="recipientAddressDetails" class="block text-gray-700 text-sm font-bold mb-2">Recipient Address Details</label>
+                            <textarea id="recipientAddressDetails" v-model="form.recipientAddressDetails" class="form-textarea w-full"></textarea>
+                            <label for="recipientNearFacility" class="block text-gray-700 text-sm font-bold mb-2">Recipient Near Facility</label>
+                            <!-- Dropdown menu for recipient near facility -->
+                            <select id="recipientNearFacility" v-model="form.recipientNearFacility" class="form-select w-full">
+                                <!-- Loop through the facilities and generate options dynamically -->
+                                <option v-for="facility in facilitiesResponse" :key="facility.id" :value="facility.id">
+                                    {{ facility.name }} - {{ facility.location }}
+                                </option>
+                            </select>
+                        </div>
                     </div>
                     <div class="mb-4">
                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Shipment</button>
                     </div>
                 </form>
-
-                <!-- Display Shipments -->
+            </div>
+        </div>
+        <div class="py-12 flex justify-center">
+            <div class="max-w-3xl w-full bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <!-- Display Shipments -->
                 <h3>My Shipments</h3>
                 <ul>
                     <li v-for="shipment in shipments" :key="shipment.id">
@@ -285,7 +337,7 @@ const saveChanges = async () => {
                             <span><strong>Facility:</strong> {{ shipment.recipient.facility ? shipment.recipient.facility.location : 'N/A' }}</span><br>
                             <span><strong>Tracking Token:</strong> {{ shipment.tracking_token }}</span>
                         </div>
-                        <!-- Buttons to update status and delete shipment -->
+                        <!-- Buttons to update shipment and delete shipment -->
                         <div>
                             <!-- Use data-toggle and data-target attributes to trigger the modal -->
                             <button @click="openShipmentDetailsModal(shipment)" class="btn btn-primary">Details/Update</button>
@@ -297,74 +349,113 @@ const saveChanges = async () => {
                 </ul>
                 <!-- Modal for displaying shipment details -->
                 <div class="modal fade" id="shipmentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="shipmentDetailsModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="shipmentDetailsModalLabel">Shipment Details</h5>
+                    <div class="modal-dialog max-w-lg mx-auto" role="document">
+                        <div class="modal-content bg-white rounded-md shadow-lg">
+                            <div class="modal-header bg-blue-500 rounded-t-md">
+                                <h5 class="modal-title text-lg font-bold text-white" id="shipmentDetailsModalLabel">Shipment Details</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body" v-if="modalShipment">
-                                <!-- Display shipment details here -->
-                                <p><strong>Shipment ID:</strong> {{ modalShipment.id }}</p>
-                                <p><strong>Item Name:</strong> <input type="text" v-model="modalShipment.item.name"></p>
-                                <p><strong>Item Description:</strong> <input type="text" v-model="modalShipment.item.description"></p>
-                                <p><strong>Sender Name:</strong> <input type="text" v-model="modalShipment.sender.name"></p>
-                                <p><strong>Sender Email:</strong> <input type="text" v-model="modalShipment.sender.email"></p>
-                                <p><strong>Sender Phone:</strong> <input type="text" v-model="modalShipment.sender.phone"></p>
-                                <div>
-                                    <label for="state">Sender State:</label>
-                                    <select v-model="modalShipment.sender.address.state" id="state" class="form-select">
-                                        <option disabled value="">Select State</option>
-                                        <option v-for="state in states" :key="state.id" :value="state.name" :selected="state.name === modalShipment.sender.address.state">{{ state.name }}</option>
-                                    </select>
+                            <div class="modal-body p-4" v-if="modalShipment">
+                                <!-- ID Section -->
+                                <div class="bg-purple-300 px-4 py-4 rounded-md mb-0.5">
+                                    <p class="text-lg font-bold text-center text-purple-800">Shipment ID: {{ modalShipment.id }}</p>
                                 </div>
-                                <div>
-                                    <label for="city">Sender City:</label>
-                                    <select v-model="modalShipment.sender.address.city" id="city" class="form-select">
-                                        <option disabled value="">Select City</option>
-                                        <option v-for="city in cities" :key="city.id" :value="city.name" :selected="city.name === modalShipment.sender.address.city">{{ city.name }}</option>
-                                    </select>
+                                <!-- Item Details Section -->
+                                <div class="bg-purple-300 rounded-md">
+                                    <button @click="toggleItemDetails" class="w-full bg-purple-500 text-white
+                                    text-left p-2 rounded-md mb-1 flex justify-between items-center">
+                                        <span>Item Details</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-0 transition-transform" :class="{ 'rotate-180': showItemDetails }" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 12a1 1 0 0 1-1-1V7a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zM8 9a1 1 0 0 1 0-2h4a1 1 0 0 1 0 2H8z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                    <div v-show="showItemDetails" class="border border-purple-500 rounded-md p-4">
+                                        <p><strong>Item Name:</strong> <input type="text" v-model="modalShipment.item.name" class="input-field"></p>
+                                        <p><strong>Item Description:</strong> <input type="text" v-model="modalShipment.item.description" class="input-field"></p>
+                                    </div>
                                 </div>
-                                <p><strong>Sender Street:</strong> <input type="text" v-model="modalShipment.sender.address.street"></p>
-                                <p><strong>Sender Address Details:</strong> <input type="text" v-model="modalShipment.sender.address.details"></p>
-                                <p><strong>Recipient Name:</strong> <input type="text" v-model="modalShipment.recipient.name"></p>
-                                <p><strong>Recipient Email:</strong> <input type="text" v-model="modalShipment.recipient.email"></p>
-                                <p><strong>Recipient Phone:</strong> <input type="text" v-model="modalShipment.recipient.phone"></p>
-                                <div>
-                                    <label for="state">Recipient State:</label>
-                                    <select v-model="modalShipment.recipient.address.state" id="state" class="form-select">
-                                        <option disabled value="">Select State</option>
-                                        <option v-for="state in states" :key="state.id" :value="state.name" :selected="state.name === modalShipment.recipient.address.state">{{ state.name }}</option>
-                                    </select>
+                                <!-- Sender Details Section -->
+                                <div class="bg-purple-300 rounded-md">
+                                    <button @click="toggleSenderDetails" class="w-full bg-purple-500 text-white text-left p-2 rounded-md mb-1 flex justify-between items-center">
+                                        <span>Sender Details</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-0 transition-transform" :class="{ 'rotate-180': showSenderDetails }" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 12a1 1 0 0 1-1-1V7a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zM8 9a1 1 0 0 1 0-2h4a1 1 0 0 1 0 2H8z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                    <div v-show="showSenderDetails" class="border border-purple-500 rounded-md p-4">
+                                        <p><strong>Sender Name:</strong> <input type="text" v-model="modalShipment.sender.name" class="input-field"></p>
+                                        <p><strong>Sender Email:</strong> <input type="text" v-model="modalShipment.sender.email" class="input-field"></p>
+                                        <p><strong>Sender Phone:</strong> <input type="text" v-model="modalShipment.sender.phone" class="input-field"></p>
+                                        <div>
+                                            <label for="state">Sender State:</label>
+                                            <select v-model="modalShipment.sender.address.state" id="state" class="form-select">
+                                                <option disabled value="">Select State</option>
+                                                <option v-for="state in states" :key="state.id" :value="state.name" :selected="state.name === modalShipment.sender.address.state">{{ state.name }}</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="city">Sender City:</label>
+                                            <select v-model="modalShipment.sender.address.city" id="city" class="form-select">
+                                                <option disabled value="">Select City</option>
+                                                <option v-for="city in cities" :key="city.id" :value="city.name" :selected="city.name === modalShipment.sender.address.city">{{ city.name }}</option>
+                                            </select>
+                                        </div>
+                                        <p><strong>Sender Street:</strong> <input type="text" v-model="modalShipment.sender.address.street"></p>
+                                        <p><strong>Sender Address Details:</strong> <input type="text" v-model="modalShipment.sender.address.details"></p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="city">Recipient City:</label>
-                                    <select v-model="modalShipment.recipient.address.city" id="city" class="form-select">
-                                        <option disabled value="">Select City</option>
-                                        <option v-for="city in cities" :key="city.id" :value="city.name" :selected="city.name === modalShipment.recipient.address.city">{{ city.name }}</option>
-                                    </select>
+                                <!-- Recipient Details Section -->
+                                <div class="bg-purple-300 rounded-md">
+                                    <button @click="toggleRecipientDetails" class="w-full bg-purple-500 text-white text-left p-2 rounded-md mb-0.5 flex justify-between items-center">
+                                        <span>Recipient Details</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-0 transition-transform" :class="{ 'rotate-180': showRecipientDetails }" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 12a1 1 0 0 1-1-1V7a1 1 0 0 1 2 0v4a1 1 0 0 1-1 1zM8 9a1 1 0 0 1 0-2h4a1 1 0 0 1 0 2H8z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                    <div v-show="showRecipientDetails" class="border border-purple-500 rounded-md p-4">
+                                        <p><strong>Recipient Name:</strong> <input type="text" v-model="modalShipment.recipient.name" class="input-field"></p>
+                                        <p><strong>Recipient Email:</strong> <input type="text" v-model="modalShipment.recipient.email" class="input-field"></p>
+                                        <p><strong>Recipient Phone:</strong> <input type="text" v-model="modalShipment.recipient.phone" class="input-field"></p>
+                                        <div>
+                                            <label for="state">Recipient State:</label>
+                                            <select v-model="modalShipment.recipient.address.state" id="state" class="form-select">
+                                                <option disabled value="">Select State</option>
+                                                <option v-for="state in states" :key="state.id" :value="state.name" :selected="state.name === modalShipment.recipient.address.state">{{ state.name }}</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="city">Recipient City:</label>
+                                            <select v-model="modalShipment.recipient.address.city" id="city" class="form-select">
+                                                <option disabled value="">Select City</option>
+                                                <option v-for="city in cities" :key="city.id" :value="city.name" :selected="city.name === modalShipment.recipient.address.city">{{ city.name }}</option>
+                                            </select>
+                                        </div>
+                                        <p><strong>Recipient Street:</strong> <input type="text" v-model="modalShipment.recipient.address.street"></p>
+                                        <p><strong>Recipient Address Details:</strong> <input type="text" v-model="modalShipment.recipient.address.details"></p>
+                                        <div>
+                                            <label for="facility" class="text-purple-800">Facility: {{ modalShipment.recipient.facility.id }}</label>
+                                            <select v-model="modalShipment.recipient.facility" id="facility" class="form-select input-field">
+                                                <option disabled value="">Select Facility</option>
+                                                <option v-for="facility in facilitiesResponse"
+                                                        :key="facility.id"
+                                                        :value="String(facility.id)"
+                                                        :selected="String(facility.id) === String(modalShipment.recipient.facility.id)">
+                                                    {{ facility.name }} - {{ facility.location }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p><strong>Recipient Street:</strong> <input type="text" v-model="modalShipment.recipient.address.street"></p>
-                                <p><strong>Recipient Address Details:</strong> <input type="text" v-model="modalShipment.recipient.address.details"></p>
-                                <div>
-                                    <label for="facility">Facility: {{ modalShipment.recipient.facility.id }}</label>
-                                    <select v-model="modalShipment.recipient.facility" id="facility" class="form-select">
-                                        <option disabled value="">Select Facility</option>
-                                        <option v-for="facility in facilitiesResponse"
-                                                :key="facility.id"
-                                                :value="String(facility.id)"
-                                                :selected="String(facility.id) === String(modalShipment.recipient.facility.id)">
-                                            {{ facility.name }} - {{ facility.location }}
-                                        </option>
-                                    </select>
+                                <!-- Tracking Token Section -->
+                                <div class="bg-purple-400 px-4 py-4 rounded-md mb-4">
+                                    <p class="text-lg font-bold text-center text-purple-800">Tracking Token: {{ modalShipment.tracking_token }}</p>
                                 </div>
-                                <p><strong>Tracking Token:</strong> {{ modalShipment.tracking_token }}</p>
                                 <!-- Save button -->
-                                <button @click="saveChanges" class="btn btn-success">Save</button>
+                                <button @click="saveChanges" class="mt-4 w-full bg-blue-500 text-white hover:bg-purple-700 py-2 px-4 rounded-md">Save</button>
                             </div>
-                            <div class="modal-body" v-else>
+                            <div class="modal-body p-4" v-else>
                                 Loading...
                             </div>
                         </div>
@@ -383,7 +474,6 @@ const saveChanges = async () => {
     color: #333;
 }
 
-/* Add this CSS to your stylesheet or <style> tag */
 #notification-container {
     position: fixed;
     top: 20px;
