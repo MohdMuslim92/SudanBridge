@@ -43,7 +43,7 @@ class FacilitySeeder extends Seeder
             ],
             [
                 'name' => 'Distribution center',
-                'location' => 'Khartoum',
+                'location' => 'Omdurman',
             ],
         ];
 
