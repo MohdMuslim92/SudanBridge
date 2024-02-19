@@ -130,21 +130,20 @@ onMounted(async () => {
 // Function to add a new shipment
 const addShipment = async () => {
     try {
-        await form.post('/api/shipments', {
-            onSuccess: async () => { // Mark the onSuccess callback as async
-                form.reset();
-                // Fetch updated shipment list
-                try {
-                    const response = await axios.get('/api/shipments');
-                    shipments.value = response.data;
-                } catch (error) {
-                    console.error('Error fetching updated shipment list:', error);
-                }
-            },
-            onError: (errors) => {
-                console.error('Error adding shipment:', errors);
-            }
-        });
+        const response = await form.post('/api/shipments');
+        itemDetails.value = false;
+        senderDetails.value = false;
+        recipientDetails.value = false;
+
+        // Show notification
+        showNotification("Shipment created successfully");
+
+        // Reset form fields
+        form.reset();
+
+        // Fetch updated shipment list
+        const updatedResponse = await axios.get('/api/shipments');
+        shipments.value = updatedResponse.data;
     } catch (error) {
         console.error('Error adding shipment:', error);
     }
@@ -155,6 +154,12 @@ const openShipmentDetailsModal = (shipment) => {
     modalShipment.value = shipment;
     $('#shipmentDetailsModal').modal('show'); // Manually trigger the Bootstrap modal
 };
+
+// Function to close shipment details modal
+const closeModal = () => {
+    $('#shipmentDetailsModal').modal('hide');
+};
+
 // Function to delete a shipment
 const deleteShipment = async (shipmentId) => {
     // Show confirmation dialog
@@ -172,6 +177,7 @@ const deleteShipment = async (shipmentId) => {
             // Refetch shipments after deletion
             const response = await axios.get('/api/shipments');
             shipments.value = response.data;
+            updateDisplayedShipments();
         } catch (error) {
             console.error('Error deleting shipment:', error);
             // Show an error message
@@ -217,6 +223,8 @@ const saveChanges = async () => {
             // Refetch shipments after deletion
             const shipmentResponse = await axios.get('/api/shipments');
             shipments.value = shipmentResponse.data;
+            // Close the Modal
+            $('#shipmentDetailsModal').modal('hide');
         } else {
             console.error('No shipment selected.');
         }
@@ -364,7 +372,7 @@ const saveChanges = async () => {
                     </div>
                 </div>
                 <div class="navigation-arrows">
-                    <button @click="scrollShipments(-1)" class="arrow-btn left-arrow">&lt;</button>
+                    <button @click="scrollShipments(-1)" class="arrow-btn left-arrow">&gt;</button>
                     <button @click="scrollShipments(1)" class="arrow-btn right-arrow">&gt;</button>
                 </div>
                 <!-- Modal for displaying shipment details -->
@@ -373,7 +381,7 @@ const saveChanges = async () => {
                         <div class="modal-content bg-white rounded-md shadow-lg">
                             <div class="modal-header bg-blue-500 rounded-t-md">
                                 <h5 class="modal-title text-lg font-bold text-white" id="shipmentDetailsModalLabel">Shipment Details</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <button type="button" class="close" aria-label="Close" @click="closeModal">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>

@@ -104,9 +104,6 @@ class ShipmentsController extends Controller
         $shipment->tracking_token = $trackingToken; // Assign the tracking token
         $shipment->user_id = $userId; // Assign the current user ID
         $shipment->save();
-
-        // Return a response
-        return response()->json(['message' => 'Shipment created successfully'], 201);
     }
 
     public function update(Request $request, $id)
