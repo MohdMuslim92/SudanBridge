@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('recipients', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email');
             $table->string('phone');
             $table->bigInteger('address_id')->unsigned();
             $table->bigInteger('near_facility_id')->unsigned();
