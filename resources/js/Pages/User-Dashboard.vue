@@ -56,6 +56,9 @@ const showItemDetails = ref(false);
 const showSenderDetails = ref(false);
 const showRecipientDetails = ref(false);
 
+const displayedShipments = ref([]);
+let currentIndex = 0;
+
 // Function to toggle visibility of item details in add shipment section
 const toggleItem = () => {
     itemDetails.value = !itemDetails.value;
@@ -92,13 +95,25 @@ const toggleSenderDetails = () => {
 const toggleRecipientDetails = () => {
     showRecipientDetails.value = !showRecipientDetails.value;
 };
+
+const updateDisplayedShipments = () => {
+    displayedShipments.value = shipments.value.slice(currentIndex, currentIndex + 2);
+};
+
+const scrollShipments = (direction) => {
+    const newIndex = currentIndex + direction * 2;
+    if (newIndex >= 0 && newIndex < shipments.value.length) {
+        currentIndex = newIndex;
+        updateDisplayedShipments();
+    }
+};
 // Fetch user data and shipments on component mount
 onMounted(async () => {
     try {
         // Fetch shipments associated with the user
         const response = await axios.get('/api/shipments');
         shipments.value = response.data;
-        console.log(shipments.value);
+        updateDisplayedShipments();
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -197,7 +212,11 @@ const saveChanges = async () => {
         // Make a request to update the shipment details
         if (modalShipment.value) {
             const response = await axios.put(`/api/shipments/${modalShipment.value.id}`, modalShipment.value);
-            console.log('Shipment details updated:', response.data);
+            // Show notification
+            showNotification("Shipment details updated");
+            // Refetch shipments after deletion
+            const shipmentResponse = await axios.get('/api/shipments');
+            shipments.value = shipmentResponse.data;
         } else {
             console.error('No shipment selected.');
         }
@@ -325,10 +344,9 @@ const saveChanges = async () => {
         </div>
         <div class="py-12 flex justify-center">
             <div class="max-w-3xl w-full bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-            <!-- Display Shipments -->
                 <h3>My Shipments</h3>
-                <ul>
-                    <li v-for="shipment in shipments" :key="shipment.id">
+                <div class="shipment-cards-container">
+                    <div class="shipment-card" v-for="shipment in displayedShipments" :key="shipment.id">
                         <div>
                             <span><strong>Shipment ID:</strong> {{ shipment.id }}</span><br>
                             <span><strong>Item Name:</strong> {{ shipment.item.name }}</span><br>
@@ -337,16 +355,18 @@ const saveChanges = async () => {
                             <span><strong>Facility:</strong> {{ shipment.recipient.facility ? shipment.recipient.facility.location : 'N/A' }}</span><br>
                             <span><strong>Tracking Token:</strong> {{ shipment.tracking_token }}</span>
                         </div>
-                        <!-- Buttons to update shipment and delete shipment -->
                         <div>
-                            <!-- Use data-toggle and data-target attributes to trigger the modal -->
                             <button @click="openShipmentDetailsModal(shipment)" class="btn btn-primary">Details/Update</button>
                             <button @click="deleteShipment(shipment.id)" class="btn btn-danger">Delete</button>
                             <div id="notification-container"></div>
 
                         </div>
-                    </li>
-                </ul>
+                    </div>
+                </div>
+                <div class="navigation-arrows">
+                    <button @click="scrollShipments(-1)" class="arrow-btn left-arrow">&lt;</button>
+                    <button @click="scrollShipments(1)" class="arrow-btn right-arrow">&gt;</button>
+                </div>
                 <!-- Modal for displaying shipment details -->
                 <div class="modal fade" id="shipmentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="shipmentDetailsModalLabel" aria-hidden="true">
                     <div class="modal-dialog max-w-lg mx-auto" role="document">
@@ -492,5 +512,40 @@ const saveChanges = async () => {
 
 .notification.fade-out {
     opacity: 0;
+}
+
+.shipment-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.shipment-card {
+    width: calc(50% - 10px);
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.navigation-arrows {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.arrow-btn {
+    font-size: 20px;
+    margin: 0 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.left-arrow {
+    transform: rotate(180deg);
 }
 </style>
