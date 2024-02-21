@@ -45,6 +45,7 @@ class Shipment extends Model
         'sender_id',
         'recipient_id',
         'user_id',
+        'status_id',
         'tracking_token',
     ];
 
@@ -66,5 +67,10 @@ class Shipment extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(Status::class);
     }
 }
