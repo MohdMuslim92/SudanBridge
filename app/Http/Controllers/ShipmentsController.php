@@ -28,6 +28,30 @@ class ShipmentsController extends Controller
         // Return the processed shipments data as a JSON response
         return response()->json($shipments);
     }
+
+    public function getShipmentByToken($token)
+    {
+        // Fetch the shipment details from the database based on the token
+        //$shipment = Shipment::where('tracking_token', $token)->first();
+// Fetch the shipment details and related data from the database based on the token
+        $shipment = Shipment::with([
+            'item',
+            'sender',
+            'sender.address',
+            'recipient',
+            'recipient.address',
+            'recipient.facility'
+        ])->where('tracking_token', $token)->first();
+
+        if ($shipment) {
+            // Return the shipment details as JSON response
+            return response()->json($shipment);
+        } else {
+            // If shipment not found, return a message
+            return response()->json(['error' => 'Shipment not found']);
+        }
+    }
+
     public function store(Request $request)
     {
         // Generate a tracking token
