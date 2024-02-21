@@ -49,6 +49,8 @@ Route::post('/dashboard/updateFacility/{userId}', [DashboardController::class, '
 Route::middleware('auth')->group(function () {
     // Routes for managing shipments
     Route::get('/api/shipments', [ShipmentsController::class, 'index']);
+// Define a route to fetch shipment details by token
+    Route::get('/api/shipments/{token}', [ShipmentsController::class, 'getShipmentByToken']);
     Route::post('/api/shipments', [ShipmentsController::class, 'store']);
     Route::put('/api/shipments/{id}', [ShipmentsController::class, 'update']);
     Route::delete('/api/shipments/{id}', [ShipmentsController::class, 'destroy']);
