@@ -27,6 +27,8 @@ const cities = ref([
 
 const searchToken = ref(''); // Ref to store the search token entered by the user
 
+const statuses = ref('');
+
 const form = useForm({
     itemName: '',
     itemDescription: '',
@@ -96,6 +98,7 @@ const showModal = (shipmentDetails) => {
     shipmentData.value = shipmentDetails;
     $('.shipmentByTokenModal').modal('show'); // Manually trigger the Bootstrap modal
 };
+
 // Function to toggle visibility of item details in add shipment section
 const toggleItem = () => {
     itemDetails.value = !itemDetails.value;
@@ -151,6 +154,11 @@ onMounted(async () => {
         const response = await axios.get('/api/shipments');
         shipments.value = response.data;
         updateDisplayedShipments();
+
+        // Fetch statuses
+        const statusResponse = await axios.get(`/api/statuses`);
+        statuses.value = statusResponse.data;
+
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -195,6 +203,7 @@ const openShipmentDetailsModal = (shipment) => {
 // Function to close shipment details modal
 const closeModal = () => {
     $('#shipmentDetailsModal').modal('hide');
+    $('#shipmentByTokenModal').modal('hide');
 };
 
 // Function to delete a shipment
@@ -257,11 +266,11 @@ const saveChanges = async () => {
             const response = await axios.put(`/api/shipments/${modalShipment.value.id}`, modalShipment.value);
             // Show notification
             showNotification("Shipment details updated");
-            // Refetch shipments after deletion
+            // Refetch shipments after update
             const shipmentResponse = await axios.get('/api/shipments');
             shipments.value = shipmentResponse.data;
             // Close the Modal
-            $('#shipmentDetailsModal').modal('hide');
+            closeModal();
         } else {
             console.error('No shipment selected.');
         }
@@ -271,6 +280,27 @@ const saveChanges = async () => {
 };
 
 
+// Function to update status in shipment
+const saveStatus = async (trackingToken, statusId) => {
+    try {
+        // Make a request to update the shipment details
+        if (statusId) {
+            console.log(statusId);
+            const saveStatusResponse = await axios.post(`/api/shipments/${trackingToken}`, { status_id: statusId });
+            // Show notification
+            showNotification("Shipment status updated");
+            // Refetch shipments after update
+            const shipmentResponse = await axios.get('/api/shipments');
+            shipments.value = shipmentResponse.data;
+            // Close the Modal
+            closeModal();
+        } else {
+            console.error('No shipment selected.');
+        }
+    } catch (error) {
+        console.error('Error saving changes:', error);
+    }
+};
 </script>
 
 <template>
@@ -305,6 +335,18 @@ const saveChanges = async () => {
                                     <span><strong>Recipient Name:</strong> {{ shipmentData.recipient?.name }}</span><br>
                                     <span><strong>Facility:</strong> {{ shipmentData.recipient?.facility ? shipmentData.recipient?.facility.location : 'N/A' }}</span><br>
                                     <span><strong>Tracking Token:</strong> {{ shipmentData.tracking_token }}</span>
+                                    <!-- Dropdown menu for status -->
+                                    <div class="mt-4">
+                                        <label for="status" class="font-bold">Status:</label>
+                                        <select v-model="shipmentData.status_id" id="status" class="form-control">
+                                            <option v-for="status in statuses" :value="status.id">{{ status.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- Modal Footer with Save button -->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" @click="saveStatus(shipmentData.tracking_token, shipmentData.status_id)">Save</button>
+                                    <button type="button" class="btn btn-secondary" @click="closeModal">Close</button>
                                 </div>
                             </div>
                         </div>
