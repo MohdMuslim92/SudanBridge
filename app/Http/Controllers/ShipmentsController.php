@@ -10,6 +10,7 @@ use App\Models\Sender;
 use App\Models\Shipment;
 use Illuminate\Support\Str; // Import the Str class to use the Str::random() method
 
+
 class ShipmentsController extends Controller
 {
     public function index()
@@ -195,6 +196,29 @@ class ShipmentsController extends Controller
 
         // Return a response
         return response()->json(['message' => 'Shipment updated successfully'], 200);
+    }
+
+    public function updateStatus(Request $request, $token)
+    {
+        try {
+            // Validate incoming request data
+            $validatedData = $request->validate([
+                'status_id' => 'required|numeric',
+            ]);
+
+            // Find the shipment by token
+            $shipment = Shipment::where('tracking_token', $token)->firstOrFail();
+
+            // Update the shipment status
+            $shipment->status_id = $validatedData['status_id'];
+            $shipment->save();
+
+            // Return a success response
+            return response()->json(['message' => 'Shipment status updated successfully'], 200);
+        } catch (\Exception $e) {
+            // Handle any errors (e.g., validation error or shipment not found)
+            return response()->json(['error' => 'Failed to update shipment status'], 400);
+        }
     }
 
     public function destroy($id)
