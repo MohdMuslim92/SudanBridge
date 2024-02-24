@@ -8,6 +8,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ShipmentsController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\StatusesController;
+use App\Http\Controllers\CitiesController;
+use App\Http\Controllers\TrackingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +39,8 @@ Route::get('/user/dashboard', function () {
     return Inertia::render('User-Dashboard');
 })->middleware(['auth', 'verified'])->name('user.dashboard');
 
+Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -60,6 +64,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/statuses', [StatusesController::class, 'index']);
     // Route to update shipment status
     Route::post('/api/shipments/{token}', [ShipmentsController::class, 'updateStatus']);
+
+    // Route to fetch cities
+    Route::get('/api/cities', [CitiesController::class, 'index']);
 
 });
 
