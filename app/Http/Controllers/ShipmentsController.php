@@ -9,6 +9,7 @@ use App\Models\Recipient;
 use App\Models\Sender;
 use App\Models\Shipment;
 use Illuminate\Support\Str; // Import the Str class to use the Str::random() method
+use Illuminate\Support\Facades\Log;
 
 
 class ShipmentsController extends Controller
@@ -136,6 +137,7 @@ class ShipmentsController extends Controller
         // Find the shipment by id
         $shipment = Shipment::findOrFail($id);
 
+        Log::error($request);
         // Validate incoming request data
         $validatedData = $request->validate([
             'item.name' => 'required|string',
@@ -154,7 +156,7 @@ class ShipmentsController extends Controller
             'recipient.address.street' => 'required|string',
             'recipient.address.city' => 'required|string',
             'recipient.address.state' => 'required|string',
-            'recipient.facility' => 'required|numeric',
+            'recipient.facility.id' => 'required|numeric',
         ]);
 
         // Update the item
@@ -183,7 +185,7 @@ class ShipmentsController extends Controller
             'name' => $validatedData['recipient']['name'],
             'email' => $validatedData['recipient']['email'],
             'phone' => $validatedData['recipient']['phone'],
-            'near_facility_id' => $validatedData['recipient']['facility'],
+            'near_facility_id' => $validatedData['recipient']['facility']['id'],
         ]);
 
         // Update the recipient's address
