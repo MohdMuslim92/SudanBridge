@@ -476,7 +476,7 @@ const saveChanges = async () => {
                                                 <option disabled value="">Select Facility</option>
                                                 <option v-for="facility in facilitiesResponse"
                                                         :key="facility.id"
-                                                        :value="String(facility.id)"
+                                                        :value="facility.id"
                                                         :selected="String(facility.id) === String(modalShipment.recipient.facility.id)">
                                                     {{ facility.name }} - {{ facility.location }}
                                                 </option>

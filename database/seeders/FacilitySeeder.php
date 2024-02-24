@@ -15,19 +15,19 @@ class FacilitySeeder extends Seeder
         $facilities = [
             [
                 'name' => 'Main store',
-                'location' => 'Portsodan',
+                'location' => 'Portsudan',
             ],
             [
                 'name' => 'Distribution center',
-                'location' => 'Portsodan',
+                'location' => 'Portsudan',
             ],
             [
                 'name' => 'Main store',
-                'location' => 'Atbra',
+                'location' => 'Atbara',
             ],
             [
                 'name' => 'Distribution center',
-                'location' => 'Atbra',
+                'location' => 'Atbara',
             ],
             [
                 'name' => 'Main store',
