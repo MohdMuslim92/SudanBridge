@@ -471,13 +471,10 @@ const saveChanges = async () => {
                                         <p><strong>Recipient Street:</strong> <input type="text" v-model="modalShipment.recipient.address.street"></p>
                                         <p><strong>Recipient Address Details:</strong> <input type="text" v-model="modalShipment.recipient.address.details"></p>
                                         <div>
-                                            <label for="facility" class="text-purple-800">Facility: {{ modalShipment.recipient.facility.id }}</label>
-                                            <select v-model="modalShipment.recipient.facility" id="facility" class="form-select input-field">
+                                            <label for="facility" class="text-purple-800">Facility: </label>
+                                            <select v-model="modalShipment.recipient.facility.id" id="facility" class="form-select input-field">
                                                 <option disabled value="">Select Facility</option>
-                                                <option v-for="facility in facilitiesResponse"
-                                                        :key="facility.id"
-                                                        :value="facility.id"
-                                                        :selected="String(facility.id) === String(modalShipment.recipient.facility.id)">
+                                                <option v-for="facility in facilitiesResponse" :key="facility.id" :value="facility.id">
                                                     {{ facility.name }} - {{ facility.location }}
                                                 </option>
                                             </select>
