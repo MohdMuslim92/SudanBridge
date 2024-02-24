@@ -25,23 +25,21 @@ class ShipmentsController extends Controller
             'recipient.facility'
         ])->get();
 
-//        \Log::info($shipments);
         // Return the processed shipments data as a JSON response
         return response()->json($shipments);
     }
 
     public function getShipmentByToken($token)
     {
-        // Fetch the shipment details from the database based on the token
-        //$shipment = Shipment::where('tracking_token', $token)->first();
-// Fetch the shipment details and related data from the database based on the token
         $shipment = Shipment::with([
             'item',
             'sender',
             'sender.address',
             'recipient',
             'recipient.address',
-            'recipient.facility'
+            'recipient.facility',
+            'user.facility',
+            'facility'
         ])->where('tracking_token', $token)->first();
 
         if ($shipment) {
@@ -55,10 +53,11 @@ class ShipmentsController extends Controller
 
     public function store(Request $request)
     {
-        // Generate a tracking token
-        $trackingToken = Str::random(10); // Generates a random string of length 10
+        // Generate a random string of length 10
+        $trackingToken = Str::random(10);
         // Get the current user ID
         $userId = auth()->user()->id;
+        $origin_facility = auth()->user()->facility_id;
 
         // Validate incoming request data
         $validatedData = $request->validate([
@@ -112,7 +111,7 @@ class ShipmentsController extends Controller
         $recipient->phone = $validatedData['recipientPhone'];
         $recipient->address_id = $recipientAddress->id; // Assign the address ID
         // Assign the user's facility ID
-        $recipient->near_facility_id = auth()->user()->facility_id;
+        $recipient->near_facility_id = $validatedData['recipientNearFacility'];
         $recipient->save();
 
         // Create an item
@@ -128,6 +127,7 @@ class ShipmentsController extends Controller
         $shipment->recipient_id = $recipient->id; // Assign the recipient ID
         $shipment->tracking_token = $trackingToken; // Assign the tracking token
         $shipment->user_id = $userId; // Assign the current user ID
+        $shipment->origin_facility_id = $origin_facility; // Assign the current user facility ID
         $shipment->save();
     }
 
@@ -154,7 +154,7 @@ class ShipmentsController extends Controller
             'recipient.address.street' => 'required|string',
             'recipient.address.city' => 'required|string',
             'recipient.address.state' => 'required|string',
-            'recipient.near_facility_id' => 'required|numeric',
+            'recipient.facility' => 'required|numeric',
         ]);
 
         // Update the item
@@ -183,7 +183,7 @@ class ShipmentsController extends Controller
             'name' => $validatedData['recipient']['name'],
             'email' => $validatedData['recipient']['email'],
             'phone' => $validatedData['recipient']['phone'],
-            'near_facility_id' => $validatedData['recipient']['near_facility_id'],
+            'near_facility_id' => $validatedData['recipient']['facility'],
         ]);
 
         // Update the recipient's address
@@ -211,12 +211,13 @@ class ShipmentsController extends Controller
 
             // Update the shipment status
             $shipment->status_id = $validatedData['status_id'];
+            $shipment->user_id = auth()->user()->id;
             $shipment->save();
 
             // Return a success response
             return response()->json(['message' => 'Shipment status updated successfully'], 200);
         } catch (\Exception $e) {
-            // Handle any errors (e.g., validation error or shipment not found)
+            // Handle any errors
             return response()->json(['error' => 'Failed to update shipment status'], 400);
         }
     }
