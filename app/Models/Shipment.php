@@ -46,6 +46,7 @@ class Shipment extends Model
         'recipient_id',
         'user_id',
         'status_id',
+        'origin_facility_id',
         'tracking_token',
     ];
 
@@ -72,5 +73,10 @@ class Shipment extends Model
     public function status()
     {
         return $this->belongsTo(Status::class);
+    }
+
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class, 'origin_facility_id');
     }
 }
