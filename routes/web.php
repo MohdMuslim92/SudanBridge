@@ -10,6 +10,8 @@ use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\StatusesController;
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\TrackingController;
+use Illuminate\Support\Facades\Auth;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +34,19 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    // Check if the user is authenticated
+    if (Auth::check()) {
+        // Check the user's role ID
+        if (Auth::user()->role_id !== 1) {
+            // Redirect users with role ID other than 1 to another route
+            return redirect()->route('user.dashboard');
+        }
+    } else {
+        // If the user is not authenticated, redirect them to the login page
+        return redirect()->route('login');
+    }
+
+    // If the user's role ID is 1, render the dashboard view
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
