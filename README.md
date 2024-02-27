@@ -44,41 +44,41 @@ To run SudanBridge locally, follow these steps:
    - Database (e.g., MySQL, PostgreSQL, SQLite)
 
 2. **Install Laravel:**
-```
-composer global require laravel/installer
-```
+    ```
+    composer global require laravel/installer
+    ```
 
 3. **Clone the repository and configure it:**
-```
-git clone https://github.com/MohdMuslim92/SudanBridge
-cd SudanBridge
-composer install
-cp .env.example .env
-```
+    ```
+    git clone https://github.com/MohdMuslim92/SudanBridge
+    cd SudanBridge
+    composer install
+    cp .env.example .env
+    ```
 
 make sure to update the .env file and change the DB_USERNAME and DB_PASSWORD to your database credintials
 
 4. **Install Frontend Dependencies and Vue.js:**
-```
-npm install
-```
+    ```
+    npm install
+    ```
 
 5. **Database Setup:**
 - Create a database for your project.
 - Run migrations:
-  ```
-  php artisan migrate
-  ```
+    ```
+    php artisan migrate
+    ```
 
 6. **Start Development Server:**
-```
-php artisan serve
-```
+    ```
+    php artisan serve
+    ```
 
 7. **Compile Assets with Laravel Mix:**
-```
-npm run dev
-```
+    ```
+    npm run dev
+    ```
 
 
 ## Usage
@@ -86,9 +86,9 @@ npm run dev
 Once SudanBridge is set up locally, you can:
 
 - run database seeder to create testing users and seed the database with the required details
-  ```
-  php artisan db:seed
-  ```
+    ```
+    php artisan db:seed
+    ```
 - Use the platform to send or receive packages and track deliveries.
 
 ## Contributing
@@ -97,7 +97,7 @@ SudanBridge is an individual project aimed at addressing specific challenges in 
 
 - Open an issue in this repository to report bugs or propose new features.
 - Fork the repository and create a pull request with your changes for review and potential inclusion.
-- Contact the project owner through [email/LinkedIn/other contact information] to discuss potential collaborations or improvements.
+- Contact the project owner through [email](mailto:mohammed.muslim2022@gmail.com) / [LinkedIn](https://www.linkedin.com/in/mohdmuslim92) to discuss potential collaborations or improvements.
 
 Your contributions, feedback, and ideas are valued and can potentially help improve SudanBridge for its users. Thank you for considering contributing to this project!
 
