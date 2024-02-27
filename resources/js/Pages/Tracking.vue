@@ -134,7 +134,8 @@ function fillingLineWidth(index) {
                             <div class="mt-1 text-xs text-green-400 font-extrabold">{{ city }}</div>
                         </div>
                         <!-- Filling line between cities -->
-                        <div v-if="index < routeCities.length - 1" class="filling-line" :style="{ width: fillingLineWidth(index) + '%' }"></div>
+                        <div v-if="index < routeCities.length" class="filling-line" :style="{ width: fillingLineWidth(index) + '%' }"></div>
+
                     </template>
                 </div>
             </div>
