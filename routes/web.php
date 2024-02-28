@@ -31,7 +31,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');;
 
 Route::get('/dashboard', function () {
     // Check if the user is authenticated
@@ -68,22 +68,25 @@ Route::post('/dashboard/updateFacility/{userId}', [DashboardController::class, '
 
 Route::middleware('auth')->group(function () {
     // Routes for managing shipments
-    Route::get('/api/shipments', [ShipmentsController::class, 'index']);
-    // Define a route to fetch shipment details by token
-    Route::get('/api/shipments/{token}', [ShipmentsController::class, 'getShipmentByToken']);
     Route::post('/api/shipments', [ShipmentsController::class, 'store']);
     Route::put('/api/shipments/{id}', [ShipmentsController::class, 'update']);
     Route::delete('/api/shipments/{id}', [ShipmentsController::class, 'destroy']);
 
-    // Route to fetch statuses
-    Route::get('/api/statuses', [StatusesController::class, 'index']);
     // Route to update shipment status
     Route::post('/api/shipments/{token}', [ShipmentsController::class, 'updateStatus']);
 
-    // Route to fetch cities
-    Route::get('/api/cities', [CitiesController::class, 'index']);
-
 });
+
+// Route to fetch shipments
+Route::get('/api/shipments', [ShipmentsController::class, 'index']);
+// Define a route to fetch shipment details by token
+Route::get('/api/shipments/{token}', [ShipmentsController::class, 'getShipmentByToken']);
+
+// Route to fetch statuses
+Route::get('/api/statuses', [StatusesController::class, 'index']);
+
+// Route to fetch cities
+Route::get('/api/cities', [CitiesController::class, 'index']);
 
 // Route for fetching facilities
 Route::middleware('auth')->group(function () {

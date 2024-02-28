@@ -20,7 +20,7 @@ const showingNavigationDropdown = ref(false);
                         <div class="flex">
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
+                                <Link :href="route($page.props.auth.user ? 'dashboard' : 'home')">
                                     <ApplicationLogo
                                         class="block h-9 w-auto fill-current text-gray-800"
                                     />
@@ -29,17 +29,23 @@ const showingNavigationDropdown = ref(false);
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                                    Dashboard
-                                </NavLink>
-
+                                <template v-if="$page.props.auth.user">
+                                    <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                        Dashboard
+                                    </NavLink>
+                                </template>
+                                <template v-else>
+                                    <NavLink :href="route('home')" :active="route().current('home')">
+                                        Home
+                                    </NavLink>
+                                </template>
                                 <NavLink :href="route('tracking')" :active="route().current('tracking')">
                                     Track Package
                                 </NavLink>
                             </div>
                         </div>
 
-                        <div class="hidden sm:flex sm:items-center sm:ms-6">
+                        <div class="hidden sm:flex sm:items-center sm:ms-6" v-if="$page.props.auth.user">
                             <!-- Settings Dropdown -->
                             <div class="ms-3 relative">
                                 <Dropdown align="right" width="48">
@@ -116,13 +122,20 @@ const showingNavigationDropdown = ref(false);
                     class="sm:hidden"
                 >
                     <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
-                        </ResponsiveNavLink>
+                        <template v-if="$page.props.auth.user">
+                            <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                Dashboard
+                            </ResponsiveNavLink>
+                        </template>
+                        <template v-else>
+                            <ResponsiveNavLink :href="route('home')" :active="route().current('home')">
+                                Home
+                            </ResponsiveNavLink>
+                        </template>
                     </div>
 
                     <!-- Responsive Settings Options -->
-                    <div class="pt-4 pb-1 border-t border-gray-200">
+                    <div class="pt-4 pb-1 border-t border-gray-200" v-if="$page.props.auth.user">
                         <div class="px-4">
                             <div class="font-medium text-base text-gray-800">
                                 {{ $page.props.auth.user.name }}
