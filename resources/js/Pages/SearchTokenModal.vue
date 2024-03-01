@@ -94,7 +94,7 @@ const saveStatus = async (trackingToken, statusId) => {
         <div class="modal-dialog max-w-lg mx-auto" role="document">
             <div class="modal-content bg-white rounded-md shadow-lg">
                 <div class="modal-header bg-blue-500 rounded-t-md">
-                    <h5 class="modal-title text-lg font-bold text-white" id="shipmentDetailsModalLabel">Shipment Details</h5>
+                    <h5 class="modal-title text-lg font-bold text-white" id="shipmentDetailsModalLabel">Shipment Status</h5>
                     <button type="button" class="close" aria-label="Close" @click="closeModal">
                         <span aria-hidden="true">&times;</span>
                     </button>
