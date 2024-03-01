@@ -40,7 +40,8 @@ class ShipmentsController extends Controller
             'recipient.address',
             'recipient.facility',
             'user.facility',
-            'facility'
+            'facility',
+            'status'
         ])->where('tracking_token', $token)->first();
 
         if ($shipment) {
