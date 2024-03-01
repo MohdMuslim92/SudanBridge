@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import Footer from "@/Pages/footer.vue";
 
 const users = ref([]);
 const roles = ref([]);
@@ -102,18 +103,15 @@ const updateFacility = async (userId, facilityId) => {
             <div class="max-w-3xl w-full bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-gradient-to-r from-blue-400 to-purple-500 text-white">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                 User
                             </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Current Role
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                 Change Role
                             </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                 Change Facility
                             </th>
                         </tr>
@@ -124,14 +122,11 @@ const updateFacility = async (userId, facilityId) => {
                                 <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ user.role ? user.role.name : 'No Role' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <select v-model="selectedRole[user.id]" class="mr-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                         <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
                                     </select>
-                                    <button @click="updateUserRole(user.id, selectedRole[user.id])" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Change</button>
+                                    <button @click="updateUserRole(user.id, selectedRole[user.id])" class="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-md hover:bg-gradient-to-r hover:from-purple-600 hover:to-purple-800 focus:outline-none focus:ring focus:ring-purple-200 focus:ring-opacity-50">Change</button>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -139,7 +134,7 @@ const updateFacility = async (userId, facilityId) => {
                                     <select v-model="selectedFacility[user.id]" class="mr-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                         <option v-for="facility in facilities" :key="facility.id" :value="facility.id">{{ facility.name }} - {{ facility.location }}</option>
                                     </select>
-                                    <button @click="updateFacility(user.id, selectedFacility[user.id])" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Change</button>
+                                    <button @click="updateFacility(user.id, selectedFacility[user.id])" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-md hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Change</button>
                                 </div>
                             </td>
                         </tr>
@@ -154,6 +149,7 @@ const updateFacility = async (userId, facilityId) => {
             <div class="h-1 bg-white mt-1" :style="{ width: `${notificationTimer}%` }"></div>
         </div>
     </AuthenticatedLayout>
+    <Footer></Footer>
 </template>
 
 <style scoped>

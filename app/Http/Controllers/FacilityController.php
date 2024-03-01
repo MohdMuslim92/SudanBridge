@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Facility;
+use Illuminate\Support\Facades\Auth;
 
 class FacilityController extends Controller
 {
@@ -26,6 +27,32 @@ class FacilityController extends Controller
         }
     }
 
+    public function getLocation(Request $request)
+    {
+        // Get the authenticated user
+        $user = Auth::user();
+
+        // Check if the user is authenticated
+        if ($user) {
+            // Get the user's facility ID
+            $facilityId = $user->facility_id;
+
+            // Fetch the facility model based on the facility ID
+            $facility = Facility::find($facilityId);
+
+            // Check if the facility exists
+            if ($facility) {
+                // Return the facility location
+                return response()->json(['facility_location' => $facility->location]);
+            } else {
+                // Facility not found, return an error
+                return response()->json(['error' => 'Facility not found'], 404);
+            }
+        } else {
+            // User is not authenticated, return an error
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+    }
     public function update(Request $request, Facility $facility)
     {
         $request->validate([

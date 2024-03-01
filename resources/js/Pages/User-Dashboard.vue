@@ -1,4 +1,6 @@
 <script setup>
+import Footer from "@/Pages/footer.vue";
+
 const script1 = document.createElement('script');
 script1.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
 document.head.appendChild(script1);
@@ -13,6 +15,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import SearchTokenModal from './SearchTokenModal.vue';
 
+const facilityLocation = ref(null);
 const shipments = ref([]);
 const facilitiesResponse = ref([]);
 const modalShipment = ref(null)
@@ -110,6 +113,15 @@ const scrollShipments = (direction) => {
 };
 // Fetch user data and shipments on component mount
 onMounted(async () => {
+    try {
+        // Fetch the user ID from the backend
+        const locationResponse = await axios.get('/api/location');
+        facilityLocation.value = locationResponse.data.facility_location;
+        console.log(facilityLocation.value);
+
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
     try {
         // Fetch shipments associated with the user
         const response = await axios.get('/api/shipments');
@@ -246,7 +258,7 @@ const saveChanges = async () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="header-container">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">User Dashboard</h2>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Facility: {{ facilityLocation }}</h2>
                 <search-token-modal
                     :showNotification="showNotification"
                     :closeModal="closeModal"
@@ -255,7 +267,9 @@ const saveChanges = async () => {
         </template>
 
         <br>
-        <h1 class="welcome-message">Welcome, {{ $page.props.auth.user.name }}!</h1>
+        <div class="welcome-container pt-4">
+            <h1 class="welcome-message">Welcome, {{ $page.props.auth.user.name }}</h1>
+        </div>
         <div class="py-12 flex justify-center">
             <div class="max-w-3xl w-full bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                 <!-- Form to add a new shipment -->
@@ -497,6 +511,7 @@ const saveChanges = async () => {
             </div>
         </div>
     </AuthenticatedLayout>
+    <Footer></Footer>
 </template>
 
 <style scoped>
@@ -506,33 +521,20 @@ const saveChanges = async () => {
     align-items: center;
 }
 
-.search-box {
-    display: flex;
-    align-items: center;
-}
-
-.search-button {
-    margin-left: 8px; /* Adjust margin as needed */
-}
-
 /* Media query for smaller screens */
 @media screen and (max-width: 768px) {
     .header-container {
         flex-direction: column; /* Stack elements vertically */
         align-items: flex-start; /* Align elements to the start */
     }
-
-    .search-box {
-        margin-top: 8px; /* Add margin at the top */
-    }
-
-    .search-button {
-        margin-left: 0; /* Reset margin */
-        margin-top: 8px; /* Add margin at the top */
-    }
 }
+
+.welcome-container {
+    display: flex;
+    justify-content: center;
+}
+
 .welcome-message {
-    padding-left: 20px;
     font-size: 24px;
     font-weight: bold;
     color: #333;
@@ -543,19 +545,6 @@ const saveChanges = async () => {
     top: 20px;
     right: 20px;
     z-index: 9999;
-}
-
-.notification {
-    background-color: #4CAF50;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: opacity 0.5s ease-out;
-}
-
-.notification.fade-out {
-    opacity: 0;
 }
 
 .shipment-cards-container {

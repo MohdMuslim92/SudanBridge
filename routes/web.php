@@ -11,6 +11,7 @@ use App\Http\Controllers\StatusesController;
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\TrackingController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\UserController;
 
 
 /*
@@ -54,6 +55,7 @@ Route::get('/user/dashboard', function () {
     return Inertia::render('User-Dashboard');
 })->middleware(['auth', 'verified'])->name('user.dashboard');
 
+
 Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
 
 Route::middleware('auth')->group(function () {
@@ -91,6 +93,7 @@ Route::get('/api/cities', [CitiesController::class, 'index']);
 // Route for fetching facilities
 Route::middleware('auth')->group(function () {
     Route::get('/api/facilities', [FacilityController::class, 'index']);
+    Route::get('/api/location', [FacilityController::class, 'getLocation']);
 });
 
 require __DIR__.'/auth.php';
