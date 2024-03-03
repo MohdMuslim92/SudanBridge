@@ -138,7 +138,6 @@ class ShipmentsController extends Controller
         // Find the shipment by id
         $shipment = Shipment::findOrFail($id);
 
-        Log::error($request);
         // Validate incoming request data
         $validatedData = $request->validate([
             'item.name' => 'required|string',
