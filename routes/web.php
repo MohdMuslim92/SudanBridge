@@ -10,6 +10,7 @@ use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\StatusesController;
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\AboutController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 
@@ -55,8 +56,11 @@ Route::get('/user/dashboard', function () {
     return Inertia::render('User-Dashboard');
 })->middleware(['auth', 'verified'])->name('user.dashboard');
 
-
+// Route to display the tracking page
 Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
+
+// Route to display the About page
+Route::get('/About', [AboutController::class, 'index'])->name('about');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
