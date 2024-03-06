@@ -11,6 +11,7 @@ use App\Http\Controllers\StatusesController;
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 
@@ -61,6 +62,9 @@ Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
 
 // Route to display the About page
 Route::get('/About', [AboutController::class, 'index'])->name('about');
+
+// Route to display the Contact page
+Route::get('/Contact', [ContactController::class, 'index'])->name('contact');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
