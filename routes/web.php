@@ -10,6 +10,11 @@ use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\StatusesController;
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\ContactController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\UserController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -29,9 +34,22 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');;
 
 Route::get('/dashboard', function () {
+    // Check if the user is authenticated
+    if (Auth::check()) {
+        // Check the user's role ID
+        if (Auth::user()->role_id !== 1) {
+            // Redirect users with role ID other than 1 to another route
+            return redirect()->route('user.dashboard');
+        }
+    } else {
+        // If the user is not authenticated, redirect them to the login page
+        return redirect()->route('login');
+    }
+
+    // If the user's role ID is 1, render the dashboard view
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -39,7 +57,17 @@ Route::get('/user/dashboard', function () {
     return Inertia::render('User-Dashboard');
 })->middleware(['auth', 'verified'])->name('user.dashboard');
 
+// Route to display the tracking page
 Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
+
+// Route to display the About page
+Route::get('/About', [AboutController::class, 'index'])->name('about');
+
+// Route to display the Contact page
+Route::get('/Contact', [ContactController::class, 'index'])->name('contact');
+
+// Route to store visitor details and message
+Route::post('/Contact/submit', [ContactController::class, 'store']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -53,26 +81,30 @@ Route::post('/dashboard/updateFacility/{userId}', [DashboardController::class, '
 
 Route::middleware('auth')->group(function () {
     // Routes for managing shipments
-    Route::get('/api/shipments', [ShipmentsController::class, 'index']);
-    // Define a route to fetch shipment details by token
-    Route::get('/api/shipments/{token}', [ShipmentsController::class, 'getShipmentByToken']);
     Route::post('/api/shipments', [ShipmentsController::class, 'store']);
     Route::put('/api/shipments/{id}', [ShipmentsController::class, 'update']);
     Route::delete('/api/shipments/{id}', [ShipmentsController::class, 'destroy']);
 
-    // Route to fetch statuses
-    Route::get('/api/statuses', [StatusesController::class, 'index']);
     // Route to update shipment status
     Route::post('/api/shipments/{token}', [ShipmentsController::class, 'updateStatus']);
 
-    // Route to fetch cities
-    Route::get('/api/cities', [CitiesController::class, 'index']);
-
 });
+
+// Route to fetch shipments
+Route::get('/api/shipments', [ShipmentsController::class, 'index']);
+// Define a route to fetch shipment details by token
+Route::get('/api/shipments/{token}', [ShipmentsController::class, 'getShipmentByToken']);
+
+// Route to fetch statuses
+Route::get('/api/statuses', [StatusesController::class, 'index']);
+
+// Route to fetch cities
+Route::get('/api/cities', [CitiesController::class, 'index']);
 
 // Route for fetching facilities
 Route::middleware('auth')->group(function () {
     Route::get('/api/facilities', [FacilityController::class, 'index']);
+    Route::get('/api/location', [FacilityController::class, 'getLocation']);
 });
 
 require __DIR__.'/auth.php';
