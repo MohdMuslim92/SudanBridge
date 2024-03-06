@@ -23,7 +23,6 @@ const submitForm = async () => {
         form.email = '';
         form.message = '';
     } catch (error) {
-        console.error('Error submitting form:', error);
         alert('Failed to submit form. Please try again later.');
     }
 };
