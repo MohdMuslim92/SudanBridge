@@ -64,14 +64,12 @@ const toggleRecipient = () => {
 const addShipment = async () => {
     try {
         const formData = form.data(); // Retrieve form data as a plain JavaScript object
-        console.log(form.data());
         // Make a request to add the shipment using form data
         const response = await axios.post('/api/shipments', formData);
-        console.log(response.data);
         // Show notification
         props.showNotification("Shipment added successfully"); // Call showNotification using props
     } catch (error) {
-        console.error('Error adding shipment:', error);
+        alert('Error adding shipment');
     }
 };
 </script>
