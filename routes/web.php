@@ -66,6 +66,9 @@ Route::get('/About', [AboutController::class, 'index'])->name('about');
 // Route to display the Contact page
 Route::get('/Contact', [ContactController::class, 'index'])->name('contact');
 
+// Route to store visitor details and message
+Route::post('/Contact/submit', [ContactController::class, 'store']);
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
