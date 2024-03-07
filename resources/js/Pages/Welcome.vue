@@ -2,6 +2,8 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from "vue";
 import Footer from "@/Pages/footer.vue";
+import NavLink from '@/Components/NavLink.vue';
+import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 
 defineProps({
     canLogin: {
@@ -68,53 +70,141 @@ function stopTimer() {
 
 startTimer();
 
-</script>
+const showingNavigationDropdown = ref(false);
+const isMobileScreen = ref(false);
 
+// Check if the screen size is mobile
+const checkMobileScreen = () => {
+    isMobileScreen.value = window.innerWidth <= 768; // Adjust the breakpoint
+}
+
+// Call the function on component mount and resize
+checkMobileScreen();
+window.addEventListener('resize', checkMobileScreen);
+</script>
 <template>
     <Head title="Welcome" />
-
-    <div class="min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white flex flex-col justify-center items-center sm:flex-row sm:justify-between">
-        <!-- Navigation Links -->
-        <div class="p-6 absolute top-0 right-0 text-start z-10">
-            <Link
-                v-if="$page.props.auth.user"
-                :href="route('dashboard')"
-                class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-            >Dashboard</Link>
-
-            <template v-else>
-                <Link
-                    :href="route('tracking')"
-                    class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                >Track Package</Link>
-
-                <Link
-                    :href="route('login')"
-                    class="pl-3 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                >Contact Us</Link>
-
-                <Link
-                    v-if="canRegister"
-                    :href="route('about')"
-                    class="ms-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
-                >About Us</Link>
-            </template>
+    <nav class="bg-gray-100">
+        <!-- Large Screen Navigation Menu -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" v-if="!isMobileScreen">
+            <!-- Navigation Links -->
+            <div class="flex justify-end h-24">
+                <!-- Navigation Links -->
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <template v-if="$page.props.auth.user">
+                        <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                            Dashboard
+                        </NavLink>
+                    </template>
+                    <template v-else>
+                        <NavLink :href="route('home')" :active="route().current('home')">
+                            Home
+                        </NavLink>
+                    </template>
+                    <NavLink :href="route('tracking')" :active="route().current('tracking')">
+                        Track Package
+                    </NavLink>
+                    <NavLink :href="route('about')" :active="route().current('about')">
+                        About Us
+                    </NavLink>
+                    <NavLink :href="route('contact')" :active="route().current('contact')">
+                        Contact Us
+                    </NavLink>
+                    <NavLink :href="route('FAQs')" :active="route().current('FAQs')">
+                        FAQs
+                    </NavLink>
+                </div>
+            </div>
         </div>
 
-        <div class="flex flex-col max-w-7xl m-auto sm:flex-row-reverse items-center w-full sm:w-auto">
-            <!-- Header Image -->
-            <div class="w-full sm:w-2/5 relative z-0 mb-6 sm:mb-0 sm:mr-6">
-                <img class="w-full object-contain" src="../../../public/img/header.png" alt="Sudan Bridge Header">
-            </div>
+        <!-- Mobile Screen Navigation Menu -->
+        <div class="sm:hidden" v-else>
+            <!-- Responsive Navigation Menu -->
+            <div class="pt-2 pb-3">
+                <div class="flex justify-end">
+                    <!-- Hamburger -->
+                    <div class="-me-2 flex items-center">
+                        <button
+                            @click="showingNavigationDropdown = !showingNavigationDropdown"
+                            class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
+                        >
+                            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                <path
+                                    :class="{
+                                                hidden: showingNavigationDropdown,
+                                                'inline-flex': !showingNavigationDropdown,
+                                            }"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
+                                <path
+                                    :class="{
+                                                hidden: !showingNavigationDropdown,
+                                                'inline-flex': showingNavigationDropdown,
+                                            }"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
 
-            <!-- Header Message and Brief -->
-            <div class="w-full sm:w-3/5 p-6 lg:p-8 text-start z-10">
-                <h1 class="text-5xl font-semibold text-gray-800 dark:text-gray-200">Reliable Delivery Solutions Across Sudan</h1>
-                <p class="mt-4 leading-10 text-xl text-gray-600 dark:text-gray-400">Welcome to Sudan Bridge, the leading delivery service provider in
-                    Sudan. We understand the importance of timely deliveries and are dedicated to bringing convenience to your doorstep.
-                    Whether it's documents, packages, or everyday essentials, our extensive network ensures prompt and reliable delivery
-                    services to every corner of Sudan. With a focus on efficiency and customer satisfaction, we're redefining delivery
-                    standards and making it easier than ever to send and receive items across the country.</p>
+                <!-- Dropdown Menu -->
+                <transition name="fade">
+                    <div v-if="showingNavigationDropdown" class="pt-2 pb-3 space-y-1">
+                        <!-- Navigation Links -->
+                        <template v-if="$page.props.auth.user">
+                            <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                Dashboard
+                            </ResponsiveNavLink>
+                        </template>
+                        <template v-else>
+                            <ResponsiveNavLink :href="route('home')" :active="route().current('home')">
+                                Home
+                            </ResponsiveNavLink>
+                        </template>
+                        <ResponsiveNavLink :href="route('tracking')" :active="route().current('tracking')">
+                            Track Package
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('about')" :active="route().current('about')">
+                            About Us
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('contact')" :active="route().current('contact')">
+                            Contact Us
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('FAQs')" :active="route().current('FAQs')">
+                            FAQs
+                        </ResponsiveNavLink>
+                    </div>
+                </transition>
+            </div>
+        </div>
+    </nav>
+
+    <div class="min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white flex flex-col justify-center items-center sm:flex-row sm:justify-between">
+        <div>
+            <div class="min-h-screen bg-gray-100 text-right">
+                <div class="flex flex-col max-w-7xl m-auto sm:flex-row-reverse items-center w-full sm:w-auto">
+                    <!-- Header Image -->
+                    <div class="w-full sm:w-2/5 relative z-0 mb-6 sm:mb-0 sm:mr-6">
+                        <img class="w-full object-contain" src="../../../public/img/header.png" alt="Sudan Bridge Header">
+                    </div>
+
+                    <!-- Header Message and Brief -->
+                    <div class="w-full sm:w-3/5 p-6 lg:p-8 text-start z-10">
+                        <h1 class="text-5xl font-semibold text-gray-800 dark:text-gray-200">Reliable Delivery Solutions Across Sudan</h1>
+                        <p class="mt-4 leading-10 text-xl text-gray-600 dark:text-gray-400">Welcome to Sudan Bridge, the leading delivery service provider in
+                            Sudan. We understand the importance of timely deliveries and are dedicated to bringing convenience to your doorstep.
+                            Whether it's documents, packages, or everyday essentials, our extensive network ensures prompt and reliable delivery
+                            services to every corner of Sudan. With a focus on efficiency and customer satisfaction, we're redefining delivery
+                            standards and making it easier than ever to send and receive items across the country.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
