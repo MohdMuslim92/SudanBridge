@@ -12,6 +12,7 @@ use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\FAQsController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 
@@ -68,6 +69,9 @@ Route::get('/Contact', [ContactController::class, 'index'])->name('contact');
 
 // Route to store visitor details and message
 Route::post('/Contact/submit', [ContactController::class, 'store']);
+
+// Route to display the FAQs page
+Route::get('/FAQs', [FAQsController::class, 'index'])->name('FAQs');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
