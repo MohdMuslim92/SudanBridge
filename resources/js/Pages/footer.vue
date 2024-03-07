@@ -15,7 +15,7 @@
             <nav class="flex flex-wrap justify-center mt-4 md:mt-0">
                 <a href="/About" class="mx-2 text-gray-300 hover:text-white">About Us</a>
                 <a href="/Contact" class="mx-2 text-gray-300 hover:text-white">Contact</a>
-                <a href="#" class="mx-2 text-gray-300 hover:text-white">FAQs</a>
+                <a href="/FAQs" class="mx-2 text-gray-300 hover:text-white">FAQs</a>
             </nav>
         </div>
     </footer>
