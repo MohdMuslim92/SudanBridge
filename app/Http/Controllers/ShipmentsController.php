@@ -9,7 +9,9 @@ use App\Models\Recipient;
 use App\Models\Sender;
 use App\Models\Shipment;
 use Illuminate\Support\Str; // Import the Str class to use the Str::random() method
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ShipmentCreated;
+use App\Mail\ShipmentCreatedForRecipient;
 
 
 class ShipmentsController extends Controller
@@ -131,6 +133,11 @@ class ShipmentsController extends Controller
         $shipment->user_id = $userId; // Assign the current user ID
         $shipment->origin_facility_id = $origin_facility; // Assign the current user facility ID
         $shipment->save();
+
+        // Send email to the sender
+        Mail::to($validatedData['senderEmail'])->send(new ShipmentCreated($shipment));
+        // Send email to the recipient
+        Mail::to($validatedData['recipientEmail'])->send(new ShipmentCreatedForRecipient($shipment));
     }
 
     public function update(Request $request, $id)
