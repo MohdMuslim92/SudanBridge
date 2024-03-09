@@ -12,8 +12,9 @@ use Illuminate\Support\Str; // Import the Str class to use the Str::random() met
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ShipmentCreated;
 use App\Mail\ShipmentCreatedForRecipient;
-
-
+use App\Mail\SenderShipmentOutForDelivery;
+use App\Mail\RecipientShipmentOutForDelivery;
+use App\Mail\ShipmentDelivered;
 class ShipmentsController extends Controller
 {
     public function index()
@@ -222,7 +223,24 @@ class ShipmentsController extends Controller
             $shipment->status_id = $validatedData['status_id'];
             $shipment->user_id = auth()->user()->id;
             $shipment->save();
-
+            if ($shipment->recipient->near_facility_id === auth()->user()->facility_id)
+            {
+                // Check if the shipment is pending at the last facility
+                if ($shipment->status_id === 1) {
+                    // Send email notification to sender
+                    Mail::to($shipment->sender->email)->send(new SenderShipmentOutForDelivery($shipment));
+                    // Send email notification to recipient
+                    Mail::to($shipment->recipient->email)->send(new RecipientShipmentOutForDelivery($shipment));
+                }
+                // Check if the shipment has delivered to the recipient
+                if ($shipment->status_id === 4)
+                {
+                    // Send email notification to sender
+                    Mail::to($shipment->sender->email)->send(new ShipmentDelivered($shipment, $shipment->sender->name));
+                    // Send email notification to recipient
+                    Mail::to($shipment->recipient->email)->send(new ShipmentDelivered($shipment, $shipment->recipient->name));
+                }
+            }
             // Return a success response
             return response()->json(['message' => 'Shipment status updated successfully'], 200);
         } catch (\Exception $e) {
