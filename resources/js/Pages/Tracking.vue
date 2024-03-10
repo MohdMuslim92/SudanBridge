@@ -25,7 +25,7 @@ onMounted(async () => {
 const searchByToken = async () => {
     try {
         // Fetch shipment details from the backend using the provided token
-        const shipmentsResponse = await axios.get(`/api/shipments/${token.value}`);
+        const shipmentsResponse = await axios.get(`/api/shipments/${token.value.trim()}`);
         shipments.value = shipmentsResponse.data;
         routeCities.value = findRoute(shipments.value.facility.location, shipments.value.recipient.facility.location, cities.value);
         currentCityPosition.value = routeCities.value.indexOf(shipments.value.user.facility.location);
