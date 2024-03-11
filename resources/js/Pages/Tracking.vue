@@ -141,7 +141,30 @@ function fillingLineWidth(index) {
                         <!-- Filling line between cities -->
                         <div v-if="index < routeCities.length" class="filling-line" :style="{ width: fillingLineWidth(index) + '%' }"></div>
                         <div v-if="index === currentCityPosition" class="status-info pb-9">
-                            <div class="text-sm font-medium text-gray-600 pt-4">{{ shipments.status.name }}</div>
+                            <div class="text-sm font-medium text-gray-600 pt-4">{{ shipments.status.name }}
+                                <div>
+                                    <div v-if="shipments.status.name === 'Pending'">
+                                        <!-- Show processing icon -->
+                                        <img src="/gif/pending.gif" alt="Processing">
+                                    </div>
+                                    <div v-else-if="shipments.status.name === 'In Transit'">
+                                        <!-- Show animation of moving truck -->
+                                        <img src="/gif/in-transit.gif" alt="Truck Animation">
+                                    </div>
+                                    <div v-else-if="shipments.status.name === 'Out for Delivery'">
+                                        <!-- Show animation of delivery person -->
+                                        <img src="/gif/out-for-delivery.gif" alt="Delivery Animation">
+                                    </div>
+                                    <div v-else-if="shipments.status.name === 'Delivered'">
+                                        <!-- Show checkmark animation -->
+                                        <img src="/gif/delivered.gif" alt="Checkmark Animation">
+                                    </div>
+                                    <div v-else-if="shipments.status.name === 'Failed'">
+                                        <!-- Show warning sign -->
+                                        <img src="/gif/failed.gif" alt="Warning Sign">
+                                    </div>
+                                </div>
+                            </div>
                             <div class="text-sm font-medium text-gray-600 pb-3">{{ new Date(shipments.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }}</div>
                         </div>
                     </template>
