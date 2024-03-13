@@ -20,6 +20,7 @@ return new class extends Migration
             $table->BigInteger('status_id')->unsigned()->default(1); // Set default value to 1
             $table->BigInteger('origin_facility_id')->unsigned();
             $table->string('tracking_token');
+            $table->string('qr_code_image');
             $table->timestamps();
 
             $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');

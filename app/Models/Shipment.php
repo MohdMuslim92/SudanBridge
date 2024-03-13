@@ -48,6 +48,7 @@ class Shipment extends Model
         'status_id',
         'origin_facility_id',
         'tracking_token',
+        'qr_code_image',
     ];
 
     public function item()
