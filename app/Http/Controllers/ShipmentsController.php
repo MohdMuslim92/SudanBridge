@@ -15,6 +15,11 @@ use App\Mail\ShipmentCreatedForRecipient;
 use App\Mail\SenderShipmentOutForDelivery;
 use App\Mail\RecipientShipmentOutForDelivery;
 use App\Mail\ShipmentDelivered;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
+
 class ShipmentsController extends Controller
 {
     public function index()
@@ -133,6 +138,22 @@ class ShipmentsController extends Controller
         $shipment->tracking_token = $trackingToken; // Assign the tracking token
         $shipment->user_id = $userId; // Assign the current user ID
         $shipment->origin_facility_id = $origin_facility; // Assign the current user facility ID
+
+        // Generate QR code content (URL)
+        $qrCodeContent = route('shipments.update_status_via_qr', ['tracking_token' => $trackingToken]);
+
+        // Create QR code SVG
+        $renderer = new ImageRenderer(
+            new RendererStyle(400),
+            new SvgImageBackEnd()
+        );
+        $writer = new Writer($renderer);
+        $qrCodeSvgPath = public_path('qrcodes/' . $trackingToken . '.svg');
+        $writer->writeFile($qrCodeContent, $qrCodeSvgPath);
+
+        // Update shipment with QR code image path
+        $shipment->qr_code_image = 'qrcodes/' . $trackingToken . '.svg';
+
         $shipment->save();
 
         // Send email to the sender
