@@ -46,9 +46,6 @@ const form = useForm({
     recipientNearFacility: ''
 });
 
-
-
-
 // Fetch user data and shipments on component mount
 onMounted(async () => {
     try {
@@ -56,11 +53,21 @@ onMounted(async () => {
         const locationResponse = await axios.get('/api/location');
         facilityLocation.value = locationResponse.data.facility_location;
 
+        // Extract query parameters from URL
+        const queryParams = new URLSearchParams(window.location.search);
+        // Get the value of the 'status' parameter
+        const status = queryParams.get('status');
+
+        // Check if the status matches the desired message
+        if (status === 'Shipment status updated successfully') {
+            // If it matches, call the showNotification function to display the confirmation
+            showNotification(status);
+        }
+
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
 });
-
 
 // Function to close shipment details modal
 const closeModal = () => {
