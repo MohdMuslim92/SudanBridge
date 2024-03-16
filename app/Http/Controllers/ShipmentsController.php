@@ -15,6 +15,12 @@ use App\Mail\ShipmentCreatedForRecipient;
 use App\Mail\SenderShipmentOutForDelivery;
 use App\Mail\RecipientShipmentOutForDelivery;
 use App\Mail\ShipmentDelivered;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
+use Illuminate\Support\Facades\Log;
+
 class ShipmentsController extends Controller
 {
     public function index()
@@ -133,6 +139,22 @@ class ShipmentsController extends Controller
         $shipment->tracking_token = $trackingToken; // Assign the tracking token
         $shipment->user_id = $userId; // Assign the current user ID
         $shipment->origin_facility_id = $origin_facility; // Assign the current user facility ID
+
+        // Generate QR code content (URL)
+        $qrCodeContent = route('shipments.update_status_via_qr', ['tracking_token' => $trackingToken]);
+
+        // Create QR code SVG
+        $renderer = new ImageRenderer(
+            new RendererStyle(400),
+            new SvgImageBackEnd()
+        );
+        $writer = new Writer($renderer);
+        $qrCodeSvgPath = public_path('qrcodes/' . $trackingToken . '.svg');
+        $writer->writeFile($qrCodeContent, $qrCodeSvgPath);
+
+        // Update shipment with QR code image path
+        $shipment->qr_code_image = 'qrcodes/' . $trackingToken . '.svg';
+
         $shipment->save();
 
         // Send email to the sender
@@ -246,6 +268,70 @@ class ShipmentsController extends Controller
         } catch (\Exception $e) {
             // Handle any errors
             return response()->json(['error' => 'Failed to update shipment status'], 400);
+        }
+    }
+
+    public function updateStatusViaQR(Request $request, $token)
+    {
+        try {
+            // Get all the shipment details
+            $shipmentDetails = Shipment::where('tracking_token', $token)->firstOrFail();
+
+            // Check if the shipment is at the last facility
+            if (auth()->user()->facility->location === $shipmentDetails->recipient->facility->location)
+            {
+                // Check if the shipment is Pending
+                if ($shipmentDetails->status_id === 1)
+                {
+                    // Change the shipment to out for delivery and change the user_id
+                    $shipmentDetails->status_id = 3;
+                    $shipmentDetails->user_id = auth()->user()->id;
+                    // Send email notification to sender
+                    Mail::to($shipmentDetails->sender->email)->send(new SenderShipmentOutForDelivery($shipmentDetails));
+                    // Send email notification to recipient
+                    Mail::to($shipmentDetails->recipient->email)->send(new RecipientShipmentOutForDelivery($shipmentDetails));
+                }
+                // Check if the shipment is Out for delivery
+                elseif ($shipmentDetails->status_id === 3) {
+                    // Change the shipment to Delivered and change the user_id
+                    $shipmentDetails->status_id = 4;
+                    $shipmentDetails->user_id = auth()->user()->id;
+                    // Send email notification to sender
+                    Mail::to($shipmentDetails->sender->email)->send(new ShipmentDelivered($shipmentDetails, $shipmentDetails->sender->name));
+                    // Send email notification to recipient
+                    Mail::to($shipmentDetails->recipient->email)->send(new ShipmentDelivered($shipmentDetails, $shipmentDetails->recipient->name));
+                }
+                // Check if the shipment is Delivered
+                elseif ($shipmentDetails->status_id === 4) {
+                    // Do nothing
+                } else {
+                    // Change the shipment to Pending and change the user_id
+                    $shipmentDetails->status_id = 1;
+                    $shipmentDetails->user_id = auth()->user()->id;
+                }
+            }
+            // If the shipment is not at the last facility
+            else {
+                // Check if the shipment is Pending
+                if ($shipmentDetails->status_id === 1) {
+                    // Change the shipment to In Transit and change the user_id
+                    $shipmentDetails->status_id = 2;
+                    $shipmentDetails->user_id = auth()->user()->id;
+                } else {
+                    // Change the shipment to Pending and change the user_id
+                    $shipmentDetails->status_id = 1;
+                    $shipmentDetails->user_id = auth()->user()->id;
+                }
+            }
+            $shipmentDetails->save();
+            // Send success message with the url
+            $message = 'Shipment status updated successfully';
+            // Redirect to the user dashboard with a success message as query parameter
+            return redirect()->route('user.dashboard', ['status' => $message]);
+
+        } catch (\Exception $e) {
+            // Handle any errors
+            return response()->json(['error' => 'Failed to update shipment status via QR code'], 400);
         }
     }
 

@@ -91,6 +91,9 @@ Route::middleware('auth')->group(function () {
 
     // Route to update shipment status
     Route::post('/api/shipments/{token}', [ShipmentsController::class, 'updateStatus']);
+    // Route to update shipment status via qr code
+    Route::get('/shipments/{tracking_token}/update-status', [ShipmentsController::class, 'updateStatusViaQR'])
+        ->name('shipments.update_status_via_qr');
 
 });
 
