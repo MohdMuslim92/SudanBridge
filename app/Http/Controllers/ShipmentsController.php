@@ -331,7 +331,9 @@ class ShipmentsController extends Controller
 
         } catch (\Exception $e) {
             // Handle any errors
-            return response()->json(['error' => 'Failed to update shipment status via QR code'], 400);
+            $message = 'Error update Shipment status';
+            // Redirect to the user dashboard with a success message as query parameter
+            return redirect()->route('user.dashboard', ['status' => $message]);
         }
     }
 
