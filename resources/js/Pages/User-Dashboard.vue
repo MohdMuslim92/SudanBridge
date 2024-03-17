@@ -62,6 +62,8 @@ onMounted(async () => {
         if (status === 'Shipment status updated successfully') {
             // If it matches, call the showNotification function to display the confirmation
             showNotification(status);
+        } else if (status && status !== 'Shipment status updated successfully') {
+            alert('Error updating the shipment status')
         }
 
     } catch (error) {
