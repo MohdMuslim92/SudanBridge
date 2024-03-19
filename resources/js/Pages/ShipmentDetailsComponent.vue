@@ -3,12 +3,17 @@ import {defineProps, ref, onMounted} from "vue";
 import axios from "axios";
 // Import the useFacilities function
 import useFacilities from '../facilities.js';
+// Import the ShipmentQr component
+import ShipmentQrComponent from './ShipmentQrComponent.vue';
 
 const displayedShipments = ref([]);
 const shipments = ref([]);
 
 // Destructure facilitiesResponse from the useFacilities function
 const { facilitiesResponse } = useFacilities();
+
+const isModalOpen = ref(false);
+
 
 let currentIndex = 0;
 
@@ -63,6 +68,17 @@ const updateDisplayedShipments = () => {
 const openShipmentDetailsModal = (shipment) => {
     modalShipment.value = shipment;
     $('#shipmentDetailsModal').modal('show'); // Manually trigger the Bootstrap modal
+};
+
+const openModal = () => {
+    isModalOpen.value = true;
+};
+
+// Function to open shipment details and QR code modal
+const openShipmentQrModal = (shipment) => {
+    modalShipment.value = shipment;
+    openModal();
+    $('#shipmentQrModal').modal('show'); // Manually trigger the Bootstrap modal
 };
 
 const scrollShipments = (direction) => {
@@ -128,7 +144,14 @@ const deleteShipment = async (shipmentId) => {
             <div class="shipment-cards-container">
                 <div class="shipment-card" v-for="shipment in displayedShipments" :key="shipment.id">
                     <div>
-                        <span><strong>Shipment ID:</strong> {{ shipment.id }}</span><br>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Shipment ID -->
+                            <span><strong>Shipment ID:</strong> {{ shipment.id }}</span>
+                            <!-- Document Icon -->
+                            <button @click="openShipmentQrModal(shipment)" class="btn btn-primary">
+                                <i class="bi bi-file-text"></i> <!-- Bootstrap document icon -->
+                            </button>
+                        </div>
                         <span><strong>Item Name:</strong> {{ shipment.item.name }}</span><br>
                         <span><strong>Sender Name:</strong> {{ shipment.sender.name }}</span><br>
                         <span><strong>Recipient Name:</strong> {{ shipment.recipient.name }}</span><br>
@@ -253,6 +276,19 @@ const deleteShipment = async (shipmentId) => {
                         <div class="modal-body p-4" v-else>
                             Loading...
                         </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal for displaying shipment details and QR code -->
+            <div class="modal fade" id="shipmentQrModal" tabindex="-1" role="dialog" aria-labelledby="shipmentQrModalLabel" aria-hidden="true">
+                <div class="modal-dialog max-w-lg mx-auto" role="document">
+                    <div class="modal-content bg-white rounded-md shadow-lg">
+                            <!-- Use ShipmentQrComponent and pass shipment details and QR code data -->
+                            <ShipmentQrComponent v-if="isModalOpen"
+                                                 :title="'Shipment Details & QR Code'"
+                                                 :shipment="modalShipment"
+                                                 :qrCodeData="'../../' + modalShipment.qr_code_image"
+                                                 :isModalOpen="isModalOpen" @close="closeModal" />
                     </div>
                 </div>
             </div>
