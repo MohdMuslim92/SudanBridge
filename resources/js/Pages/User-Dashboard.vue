@@ -8,7 +8,11 @@ document.head.appendChild(script1);
 const script2 = document.createElement('script');
 script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js';
 document.head.appendChild(script2);
-import 'jquery';
+
+const script3 = document.createElement('script');
+script3.src = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js';
+document.head.appendChild(script3);
+
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
@@ -108,6 +112,9 @@ const showNotification = (message) => {
 <template>
     <Head title="User Dashboard" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 
     <AuthenticatedLayout>
         <template #header>
@@ -124,6 +131,7 @@ const showNotification = (message) => {
         <div class="welcome-container pt-4">
             <h1 class="welcome-message">Welcome, {{ $page.props.auth.user.name }}</h1>
         </div>
+
         <!-- Include the AddShipmentComponent -->
         <AddShipmentComponent :showNotification="showNotification" :closeModal="closeModal" />
         <!-- Include the ShipmentDetailsComponent -->
