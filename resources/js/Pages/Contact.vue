@@ -1,9 +1,8 @@
 <script setup>
-import { useForm } from '@inertiajs/inertia-vue3';
 import axios from 'axios';
 import Footer from "@/Pages/footer.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {Head} from "@inertiajs/vue3";
+import {Head, useForm} from "@inertiajs/vue3";
 
 const form = useForm({
     name: '',
