@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps } from "vue";
+import { ref, defineProps, onMounted, watch } from "vue";
 import axios from "axios";
 import { useForm } from '@inertiajs/vue3';
 // Import the useFacilities function
@@ -18,7 +18,7 @@ const form = useForm({
     senderEmail: '',
     senderPhone: '',
     senderState: '',
-    senderCity: '',
+    senderLocality: '',
     senderStreet: '',
     senderAddressDetails: '',
     recipientName: '',
@@ -34,11 +34,58 @@ const form = useForm({
 const showItemDetails = ref(false);
 const showSenderDetails = ref(false);
 const showRecipientDetails = ref(false);
+
+const states = ref([]);
+const localities = ref([]);
+const recipientLocalities = ref([]);
+
+
 // Add data properties to control the visibility of add shipment sections
 const itemDetails = ref(false);
 const senderDetails = ref(false);
 const recipientDetails = ref(false);
 
+// Function to fetch localities based on the selected state
+const fetchLocalities = async () => {
+    try {
+        if (form.senderState) {
+            const localitiesResponse = await axios.get(`/api/states/${form.senderState}/localities`);
+            localities.value = localitiesResponse.data;
+        }
+    } catch (error) {
+        console.error('Error fetching localities:', error);
+    }
+};
+
+const fetchLocalitiesForRecipient = async () => {
+    try {
+        if (form.recipientState) {
+            const localitiesRecipientResponse = await axios.get(`/api/states/${form.recipientState}/localities`);
+            recipientLocalities.value = localitiesRecipientResponse.data;
+        }
+    } catch (error) {
+        console.error('Error fetching localities:', error);
+    }
+};
+
+onMounted(async () => {
+    try {
+        // Fetch states from the backend
+        const statesResponse = await axios.get('/api/states');
+        states.value = statesResponse.data;
+
+        // Fetch localities based on the selected state
+        await fetchLocalities();
+        await fetchLocalitiesForRecipient();
+    } catch (error) {
+        console.error('Error fetching states:', error);
+    }
+});
+
+// Watch for changes in senderState and fetch localities accordingly
+watch(() => form.senderState, fetchLocalities);
+// Watch for changes in recipientState and fetch localities accordingly
+watch(() => form.recipientState, fetchLocalitiesForRecipient);
 
 // Function to toggle visibility of item details in add shipment section
 const toggleItem = () => {
@@ -113,14 +160,13 @@ const addShipment = async () => {
                         <label for="senderState" class="block text-gray-700 text-sm font-bold mb-2">Sender State</label>
                         <!-- Dropdown menu for sender state -->
                         <select id="senderState" v-model="form.senderState" class="form-select w-full">
-                            <option value="state1">State 1</option>
-                            <option value="state2">State 2</option>
+                            <option v-for="state in states" :key="state.id" :value="state.id">{{ state.name }}</option>
                         </select>
-                        <label for="senderCity" class="block text-gray-700 text-sm font-bold mb-2">Sender City</label>
-                        <!-- Dropdown menu for sender city -->
-                        <select id="senderCity" v-model="form.senderCity" class="form-select w-full">
-                            <option value="city1">City 1</option>
-                            <option value="city2">City 2</option>
+
+                        <label for="senderLocality" class="block text-gray-700 text-sm font-bold mb-2">Sender Locality</label>
+                        <!-- Dropdown menu for sender locality -->
+                        <select id="senderLocality" v-model="form.senderLocality" class="form-select w-full">
+                            <option v-for="locality in localities" :key="locality.id" :value="locality.id">{{ locality.name }}</option>
                         </select>
                         <label for="senderStreet" class="block text-gray-700 text-sm font-bold mb-2">Sender Street</label>
                         <input type="text" id="senderStreet" v-model="form.senderStreet" class="form-input w-full">
@@ -146,16 +192,15 @@ const addShipment = async () => {
                         <label for="recipientPhone" class="block text-gray-700 text-sm font-bold mb-2">Recipient Phone</label>
                         <input type="text" id="recipientPhone" v-model="form.recipientPhone" class="form-input w-full">
                         <label for="recipientState" class="block text-gray-700 text-sm font-bold mb-2">Recipient State</label>
-                        <!-- Dropdown menu for recipient state -->
+                        <!-- Dropdown menu for Recipient state -->
                         <select id="recipientState" v-model="form.recipientState" class="form-select w-full">
-                            <option value="state1">State 1</option>
-                            <option value="state2">State 2</option>
+                            <option v-for="state in states" :key="state.id" :value="state.id">{{ state.name }}</option>
                         </select>
-                        <label for="recipientCity" class="block text-gray-700 text-sm font-bold mb-2">Recipient City</label>
-                        <!-- Dropdown menu for recipient city -->
-                        <select id="recipientCity" v-model="form.recipientCity" class="form-select w-full">
-                            <option value="city1">City 1</option>
-                            <option value="city2">City 2</option>
+
+                        <label for="recipientLocality" class="block text-gray-700 text-sm font-bold mb-2">Recipient Locality</label>
+                        <!-- Dropdown menu for Recipient locality -->
+                        <select id="recipientLocality" v-model="form.recipientLocality" class="form-select w-full">
+                            <option v-for="locality in recipientLocalities" :key="locality.id" :value="locality.id">{{ locality.name }}</option>
                         </select>
                         <label for="recipientStreet" class="block text-gray-700 text-sm font-bold mb-2">Recipient Street</label>
                         <input type="text" id="recipientStreet" v-model="form.recipientStreet" class="form-input w-full">
