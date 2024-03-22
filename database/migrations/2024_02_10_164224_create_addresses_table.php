@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
             $table->string('street');
-            $table->string('city');
-            $table->string('state');
+            $table->bigInteger('locality_id')->unsigned();
+            $table->bigInteger('state_id')->unsigned();
             $table->string('country')->default('Sudan'); // Set default value to 'Sudan'
             $table->text('details');
             $table->timestamps();
+
+            $table->foreign('state_id')->references('id')->on('states')->onDelete('cascade');
+            $table->foreign('locality_id')->references('id')->on('localities')->onDelete('cascade');
         });
     }
 
