@@ -15,6 +15,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FAQsController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\StateController;
 
 
 /*
@@ -82,6 +83,12 @@ Route::middleware('auth')->group(function () {
 Route::get('/dashboard/data', [DashboardController::class, 'data']);
 Route::post('/dashboard/update/{userId}', [DashboardController::class, 'updateUserRole']);
 Route::post('/dashboard/updateFacility/{userId}', [DashboardController::class, 'updateFacility']);
+
+// Route to fetch all states
+Route::get('/api/states', [StateController::class, 'index']);
+
+// Route to fetch localities based on state ID
+Route::get('/api/states/{state}/localities', [StateController::class, 'getLocalities']);
 
 Route::middleware('auth')->group(function () {
     // Routes for managing shipments
