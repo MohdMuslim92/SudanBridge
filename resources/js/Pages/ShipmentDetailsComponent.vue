@@ -1,5 +1,5 @@
 <script setup>
-import {defineProps, ref, onMounted} from "vue";
+import {defineProps, ref, onMounted, watch} from "vue";
 import axios from "axios";
 // Import the useFacilities function
 import useFacilities from '../facilities.js';
@@ -18,18 +18,20 @@ const isModalOpen = ref(false);
 let currentIndex = 0;
 
 const modalShipment = ref(null)
-const states = ref([
-    { id: 1, name: 'state1' },
-    { id: 2, name: 'state2' }
-]);
-const cities = ref([
-    { id: 1, name: 'city1' },
-    { id: 2, name: 'city2' }
-]);
 
 const showItemDetails = ref('');
 const showSenderDetails = ref('');
 const showRecipientDetails = ref('');
+
+const states = ref([]);
+const localities = ref([]);
+const recipientLocalities = ref([]);
+const senderState = ref('');
+const senderLocality = ref('');
+const recipientState = ref('');
+const recipientLocality = ref('');
+
+
 const toggleItemDetails = () => {
     showItemDetails.value = !showItemDetails.value;
 };
@@ -65,10 +67,51 @@ const updateDisplayedShipments = () => {
     displayedShipments.value = shipments.value.slice(currentIndex, currentIndex + 2);
 };
 // Function to open shipment details modal
-const openShipmentDetailsModal = (shipment) => {
+const openShipmentDetailsModal = async (shipment) => {
     modalShipment.value = shipment;
     $('#shipmentDetailsModal').modal('show'); // Manually trigger the Bootstrap modal
+
+    senderState.value = modalShipment.value.sender.address.state_id ;
+    senderLocality.value = modalShipment.value.sender.address.locality_id;
+    recipientState.value = modalShipment.value.recipient.address.state_id;
+    recipientLocality.value = modalShipment.value.recipient.address.locality_id;
+
+    // Fetch states from the backend
+    const statesResponse = await axios.get('/api/states');
+    states.value = statesResponse.data;
+
+    // Fetch localities based on the selected state
+    await fetchLocalities();
+    await fetchLocalitiesForRecipient();
+
 };
+
+// Function to fetch localities based on the selected state
+const fetchLocalities = async () => {
+    try {
+        if (senderState) {
+            const localitiesResponse = await axios.get(`/api/states/${senderState.value}/localities`);
+            localities.value = localitiesResponse.data;
+        }
+    } catch (error) {
+        alert('Error fetching localities:', error);
+    }
+};
+
+const fetchLocalitiesForRecipient = async () => {
+    try {
+        if (recipientState) {
+            const localitiesRecipientResponse = await axios.get(`/api/states/${recipientState.value}/localities`);
+            recipientLocalities.value = localitiesRecipientResponse.data;
+        }
+    } catch (error) {
+        alert('Error fetching localities:', error);
+    }
+};
+
+watch(() => senderState.value, fetchLocalities);
+// Watch for changes in recipientState and fetch localities accordingly
+watch(() => recipientState.value, fetchLocalitiesForRecipient);
 
 const openModal = () => {
     isModalOpen.value = true;
@@ -94,6 +137,14 @@ const saveChanges = async () => {
     try {
         // Make a request to update the shipment details
         if (modalShipment.value) {
+            // Update sender state and locality IDs in modalShipment
+            modalShipment.value.sender.address.state_id = senderState;
+            modalShipment.value.sender.address.locality_id = senderLocality;
+
+            // Update recipient state and locality IDs in modalShipment
+            modalShipment.value.recipient.address.state_id = recipientState;
+            modalShipment.value.recipient.address.locality_id = recipientLocality;
+
             const response = await axios.put(`/api/shipments/${modalShipment.value.id}`, modalShipment.value);
             // Show notification
             props.showNotification("Shipment details updated");
@@ -211,16 +262,16 @@ const deleteShipment = async (shipmentId) => {
                                     <p><strong>Sender Phone:</strong> <input type="text" v-model="modalShipment.sender.phone" class="input-field"></p>
                                     <div>
                                         <label for="state">Sender State:</label>
-                                        <select v-model="modalShipment.sender.address.state" id="state" class="form-select">
+                                        <select v-model="senderState" id="state" class="form-select">
                                             <option disabled value="">Select State</option>
-                                            <option v-for="state in states" :key="state.id" :value="state.name" :selected="state.name === modalShipment.sender.address.state">{{ state.name }}</option>
+                                            <option v-for="state in states" :key="state.id" :value="state.id" :selected="state.name === senderState">{{ state.name }}</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label for="city">Sender City:</label>
-                                        <select v-model="modalShipment.sender.address.city" id="city" class="form-select">
-                                            <option disabled value="">Select City</option>
-                                            <option v-for="city in cities" :key="city.id" :value="city.name" :selected="city.name === modalShipment.sender.address.city">{{ city.name }}</option>
+                                        <label for="locality">Sender Locality:</label>
+                                        <select v-model="senderLocality" id="locality" class="form-select">
+                                            <option disabled value="">Select Locality</option>
+                                            <option v-for="locality in localities" :key="locality.id" :value="locality.id" :selected="locality.name === senderLocality">{{ locality.name }}</option>
                                         </select>
                                     </div>
                                     <p><strong>Sender Street:</strong> <input type="text" v-model="modalShipment.sender.address.street"></p>
@@ -241,16 +292,16 @@ const deleteShipment = async (shipmentId) => {
                                     <p><strong>Recipient Phone:</strong> <input type="text" v-model="modalShipment.recipient.phone" class="input-field"></p>
                                     <div>
                                         <label for="state">Recipient State:</label>
-                                        <select v-model="modalShipment.recipient.address.state" id="state" class="form-select">
+                                        <select v-model="recipientState" id="state" class="form-select">
                                             <option disabled value="">Select State</option>
-                                            <option v-for="state in states" :key="state.id" :value="state.name" :selected="state.name === modalShipment.recipient.address.state">{{ state.name }}</option>
+                                            <option v-for="state in states" :key="state.id" :value="state.id" :selected="state.name === recipientState">{{ state.name }}</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label for="city">Recipient City:</label>
-                                        <select v-model="modalShipment.recipient.address.city" id="city" class="form-select">
-                                            <option disabled value="">Select City</option>
-                                            <option v-for="city in cities" :key="city.id" :value="city.name" :selected="city.name === modalShipment.recipient.address.city">{{ city.name }}</option>
+                                        <label for="locality">Recipient Locality:</label>
+                                        <select v-model="recipientLocality" id="locality" class="form-select">
+                                            <option disabled value="">Select Locality</option>
+                                            <option v-for="locality in recipientLocalities" :key="locality.id" :value="locality.id" :selected="locality.name === recipientLocality">{{ locality.name }}</option>
                                         </select>
                                     </div>
                                     <p><strong>Recipient Street:</strong> <input type="text" v-model="modalShipment.recipient.address.street"></p>

@@ -25,7 +25,7 @@ const form = useForm({
     recipientEmail: '',
     recipientPhone: '',
     recipientState: '',
-    recipientCity: '',
+    recipientLocality: '',
     recipientStreet: '',
     recipientAddressDetails: '',
     recipientNearFacility: ''
