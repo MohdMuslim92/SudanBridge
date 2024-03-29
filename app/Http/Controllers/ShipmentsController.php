@@ -32,6 +32,8 @@ class ShipmentsController extends Controller
             'sender.address',
             'recipient',
             'recipient.address',
+            'recipient.address.state',
+            'recipient.address.locality',
             'recipient.facility'
         ])->get();
 
@@ -77,15 +79,15 @@ class ShipmentsController extends Controller
             'senderName' => 'required|string',
             'senderEmail' => 'required|email',
             'senderPhone' => 'required|string',
-            'senderState' => 'required|string',
-            'senderCity' => 'required|string',
+            'senderState' => 'required|numeric',
+            'senderLocality' => 'required|numeric',
             'senderStreet' => 'required|string',
             'senderAddressDetails' => 'nullable|string',
             'recipientName' => 'required|string',
             'recipientEmail' => 'required|email',
             'recipientPhone' => 'required|string',
-            'recipientState' => 'required|string',
-            'recipientCity' => 'required|string',
+            'recipientState' => 'required|numeric',
+            'recipientLocality' => 'required|numeric',
             'recipientStreet' => 'required|string',
             'recipientAddressDetails' => 'nullable|string',
             'recipientNearFacility' => 'required|numeric',
@@ -94,16 +96,16 @@ class ShipmentsController extends Controller
         // Create an address for the sender
         $senderAddress = new Address();
         $senderAddress->street = $validatedData['senderStreet'];
-        $senderAddress->city = $validatedData['senderCity'];
-        $senderAddress->state = $validatedData['senderState'];
+        $senderAddress->state_id = $validatedData['senderState'];
+        $senderAddress->locality_id = $validatedData['senderLocality'];
         $senderAddress->details = $validatedData['senderAddressDetails'];
         $senderAddress->save();
 
         // Create an address for the recipient
         $recipientAddress = new Address();
         $recipientAddress->street = $validatedData['recipientStreet'];
-        $recipientAddress->city = $validatedData['recipientCity'];
-        $recipientAddress->state = $validatedData['recipientState'];
+        $recipientAddress->state_id = $validatedData['recipientState'];
+        $recipientAddress->locality_id = $validatedData['recipientLocality'];
         $recipientAddress->details = $validatedData['recipientAddressDetails'];
         $recipientAddress->save();
 
@@ -176,16 +178,16 @@ class ShipmentsController extends Controller
             'sender.email' => 'required|email',
             'sender.phone' => 'required|string',
             'sender.address.street' => 'required|string',
-            'sender.address.city' => 'required|string',
-            'sender.address.state' => 'required|string',
+            'sender.address.state_id' => 'required|numeric',
+            'sender.address.locality_id' => 'required|numeric',
             'sender.address.details' => 'required|string',
             'recipient.name' => 'required|string',
             'recipient.email' => 'required|email',
             'recipient.phone' => 'required|string',
             'recipient.address.details' => 'required|string',
             'recipient.address.street' => 'required|string',
-            'recipient.address.city' => 'required|string',
-            'recipient.address.state' => 'required|string',
+            'recipient.address.state_id' => 'required|numeric',
+            'recipient.address.locality_id' => 'required|numeric',
             'recipient.facility.id' => 'required|numeric',
         ]);
 
@@ -205,8 +207,8 @@ class ShipmentsController extends Controller
         // Update the sender's address
         $shipment->sender->address->update([
             'street' => $validatedData['sender']['address']['street'],
-            'city' => $validatedData['sender']['address']['city'],
-            'state' => $validatedData['sender']['address']['state'],
+            'state_id' => $validatedData['sender']['address']['state_id'],
+            'locality_id' => $validatedData['sender']['address']['locality_id'],
             'details' => $validatedData['sender']['address']['details'],
         ]);
 
@@ -221,8 +223,8 @@ class ShipmentsController extends Controller
         // Update the recipient's address
         $shipment->recipient->address->update([
             'street' => $validatedData['recipient']['address']['street'],
-            'city' => $validatedData['recipient']['address']['city'],
-            'state' => $validatedData['recipient']['address']['state'],
+            'state_id' => $validatedData['recipient']['address']['state_id'],
+            'locality_id' => $validatedData['recipient']['address']['locality_id'],
             'details' => $validatedData['recipient']['address']['details'],
         ]);
 
