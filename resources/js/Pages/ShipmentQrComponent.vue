@@ -16,8 +16,8 @@
                     <p><strong>Item Name:</strong> {{ shipment.item.name }}</p>
                     <p><strong>Sender:</strong> {{ shipment.sender.name }}</p>
                     <p><strong>Recipient:</strong> {{ shipment.recipient.name }} - {{ shipment.recipient.phone }}</p>
-                    <p><strong>Address:</strong> {{ shipment.recipient.address.state }} -
-                        {{ shipment.recipient.address.city }} -
+                    <p><strong>Address:</strong> {{ shipment.recipient.address.state.name }} -
+                        {{ shipment.recipient.address.locality.name }} -
                         {{ shipment.recipient.address.street }} - {{ shipment.recipient.address.details }}</p>
                 </div>
                 <!-- Display QR code -->
