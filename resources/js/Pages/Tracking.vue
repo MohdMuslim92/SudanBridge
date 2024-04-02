@@ -17,7 +17,7 @@ onMounted(async () => {
         const citiesResponse = await axios.get('/api/cities');
         cities.value = citiesResponse.data;
     } catch (error) {
-        console.error('Error fetching data:', error);
+        alert('Error fetching data:', error);
     }
 
 });
@@ -28,7 +28,7 @@ const searchByToken = async () => {
         const shipmentsResponse = await axios.get(`/api/shipments/${token.value.trim()}`);
         shipments.value = shipmentsResponse.data;
         routeCities.value = findRoute(shipments.value.facility.location, shipments.value.recipient.facility.location, cities.value);
-        currentCityPosition.value = routeCities.value.indexOf(shipments.value.user.facility.location);
+        currentCityPosition.value = routeCities.value.indexOf(shipments.value.current_facility.location);
 
         // Ensure that the current city is found in the routeCities array
         if (currentCityPosition.value !== -1) {
@@ -44,7 +44,7 @@ function findRoute(startingPoint, destinationPoint, cities) {
     // Check if cities is an array and convert to an array if it's not
     if (!Array.isArray(cities)) {
         // Log an error and return an empty route
-        console.error("Cities data is not an array");
+        alert("Cities data is not an array");
         return [];
     }
 
@@ -56,7 +56,7 @@ function findRoute(startingPoint, destinationPoint, cities) {
 
     // Check if the starting city exists
     if (!startingCity) {
-        console.error("Starting city not found in the cities data");
+        alert("Starting city not found in the cities data");
         return [];
     }
 
@@ -78,7 +78,7 @@ function findRoute(startingPoint, destinationPoint, cities) {
         // Check if the next city exists
         if (!nextCity || route.includes(nextCity.city_name)) {
             // Cyclic route or destination not found, break the loop
-            console.error("Cyclic route or destination not found");
+            alert("Cyclic route or destination not found");
             break;
         }
 

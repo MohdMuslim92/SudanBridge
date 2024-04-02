@@ -47,6 +47,7 @@ class Shipment extends Model
         'user_id',
         'status_id',
         'origin_facility_id',
+        'current_facility_id',
         'tracking_token',
         'qr_code_image',
     ];
@@ -79,5 +80,10 @@ class Shipment extends Model
     public function facility()
     {
         return $this->belongsTo(Facility::class, 'origin_facility_id');
+    }
+
+    public function currentFacility()
+    {
+        return $this->belongsTo(Facility::class, 'current_facility_id');
     }
 }

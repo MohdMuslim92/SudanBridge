@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->BigInteger('status_id')->unsigned()->default(1); // Set default value to 1
             $table->BigInteger('origin_facility_id')->unsigned();
+            $table->BigInteger('current_facility_id')->unsigned();
             $table->string('tracking_token');
             $table->string('qr_code_image');
             $table->timestamps();
@@ -29,6 +30,7 @@ return new class extends Migration
             $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('origin_facility_id')->references('id')->on('facilities')->onDelete('cascade');
+            $table->foreign('current_facility_id')->references('id')->on('facilities')->onDelete('cascade');
 
         });
     }
