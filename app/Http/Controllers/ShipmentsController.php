@@ -52,6 +52,7 @@ class ShipmentsController extends Controller
             'recipient.facility',
             'user.facility',
             'facility',
+            'currentFacility',
             'status'
         ])->where('tracking_token', $token)->first();
 
@@ -71,6 +72,7 @@ class ShipmentsController extends Controller
         // Get the current user ID
         $userId = auth()->user()->id;
         $origin_facility = auth()->user()->facility_id;
+        $current_facility = auth()->user()->facility_id;
 
         // Validate incoming request data
         $validatedData = $request->validate([
@@ -141,6 +143,7 @@ class ShipmentsController extends Controller
         $shipment->tracking_token = $trackingToken; // Assign the tracking token
         $shipment->user_id = $userId; // Assign the current user ID
         $shipment->origin_facility_id = $origin_facility; // Assign the current user facility ID
+        $shipment->current_facility_id = $current_facility; // Assign the current user facility ID
 
         // Generate QR code content (URL)
         $qrCodeContent = route('shipments.update_status_via_qr', ['tracking_token' => $trackingToken]);
@@ -246,6 +249,7 @@ class ShipmentsController extends Controller
             // Update the shipment status
             $shipment->status_id = $validatedData['status_id'];
             $shipment->user_id = auth()->user()->id;
+            $shipment->current_facility_id = auth()->user()->facility_id;
             $shipment->save();
             if ($shipment->recipient->near_facility_id === auth()->user()->facility_id)
             {
@@ -288,6 +292,7 @@ class ShipmentsController extends Controller
                     // Change the shipment to out for delivery and change the user_id
                     $shipmentDetails->status_id = 3;
                     $shipmentDetails->user_id = auth()->user()->id;
+                    $shipmentDetails->current_facility_id = auth()->user()->facility_id;
                     // Send email notification to sender
                     Mail::to($shipmentDetails->sender->email)->send(new SenderShipmentOutForDelivery($shipmentDetails));
                     // Send email notification to recipient
@@ -298,6 +303,7 @@ class ShipmentsController extends Controller
                     // Change the shipment to Delivered and change the user_id
                     $shipmentDetails->status_id = 4;
                     $shipmentDetails->user_id = auth()->user()->id;
+                    $shipmentDetails->current_facility_id = auth()->user()->facility_id;
                     // Send email notification to sender
                     Mail::to($shipmentDetails->sender->email)->send(new ShipmentDelivered($shipmentDetails, $shipmentDetails->sender->name));
                     // Send email notification to recipient
@@ -310,6 +316,7 @@ class ShipmentsController extends Controller
                     // Change the shipment to Pending and change the user_id
                     $shipmentDetails->status_id = 1;
                     $shipmentDetails->user_id = auth()->user()->id;
+                    $shipmentDetails->current_facility_id = auth()->user()->facility_id;
                 }
             }
             // If the shipment is not at the last facility
@@ -319,10 +326,12 @@ class ShipmentsController extends Controller
                     // Change the shipment to In Transit and change the user_id
                     $shipmentDetails->status_id = 2;
                     $shipmentDetails->user_id = auth()->user()->id;
+                    $shipmentDetails->current_facility_id = auth()->user()->facility_id;
                 } else {
                     // Change the shipment to Pending and change the user_id
                     $shipmentDetails->status_id = 1;
                     $shipmentDetails->user_id = auth()->user()->id;
+                    $shipmentDetails->current_facility_id = auth()->user()->facility_id;
                 }
             }
             $shipmentDetails->save();
