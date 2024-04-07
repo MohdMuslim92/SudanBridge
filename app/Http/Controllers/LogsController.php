@@ -17,21 +17,18 @@ class LogsController extends Controller
 
     public function getShipmentByToken($token)
     {
-        // Get the shipment id based on it's token
-        $shipment = Shipment::select('id')
-            ->where('tracking_token', $token)
-            ->first();
-
-        if ($shipment) {
-            // Retrieve shipment logs where shipment_id equals $shipment->id
-            $shipmentLogs = ShipmentLog::where('shipment_id', $shipment->id)->get();
+        try {
+            // Retrieve shipment logs based on shipment token
+            $shipmentLogs = ShipmentLog::where('token', $token)->get();
 
             // Return the shipment details and logs as JSON response
             return response()->json(['shipment_logs' => $shipmentLogs]);
-        } else {
-            // If shipment not found, return a message
-            return response()->json(['error' => 'Shipment not found']);
+        } catch (QueryException $e) {
+            // Log the error
+            \Log::error('Error retrieving shipment logs: ' . $e->getMessage());
+
+            // Return a JSON response with an error message
+            return response()->json(['error' => 'An error occurred while retrieving shipment logs.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 }
