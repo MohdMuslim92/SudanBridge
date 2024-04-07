@@ -86,4 +86,20 @@ class Shipment extends Model
     {
         return $this->belongsTo(Facility::class, 'current_facility_id');
     }
+
+    public function logs() {
+        return $this->hasMany(ShipmentLog::class);
+    }
+
+    public function createLog($shipmentId, $shipmentToken, $userId, $action, $oldData, $newData) {
+        $this->logs()->create([
+            'shipment_id' => $shipmentId,
+            'token' => $shipmentToken,
+            'user_id' => $userId,
+            'action' => $action,
+            'old_data' => $oldData,
+            'new_data' => $newData,
+        ]);
+    }
+
 }
