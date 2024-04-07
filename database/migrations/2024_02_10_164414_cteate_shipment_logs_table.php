@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('shipment_logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('shipment_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('shipment_id')->nullable();
+            $table->string('token');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('action'); // e.g., update, delete
             $table->json('old_data')->nullable(); // Store old data as JSON
             $table->json('new_data')->nullable(); // Store new data as JSON
             $table->timestamps();
 
-            $table->foreign('shipment_id')->references('id')->on('shipments')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('shipment_id')->references('id')->on('shipments')->onDelete('set null');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 
