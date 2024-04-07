@@ -10,6 +10,7 @@ use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\StatusesController;
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\LogsController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FAQsController;
@@ -62,6 +63,11 @@ Route::get('/user/dashboard', function () {
 // Route to display the tracking page
 Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
 
+// Route to display the logs page
+Route::middleware('auth')->group(function () {
+    Route::get('/logs', [LogsController::class, 'index'])->name('logs');
+});
+
 // Route to display the About page
 Route::get('/About', [AboutController::class, 'index'])->name('about');
 
@@ -108,6 +114,9 @@ Route::middleware('auth')->group(function () {
 Route::get('/api/shipments', [ShipmentsController::class, 'index']);
 // Define a route to fetch shipment details by token
 Route::get('/api/shipments/{token}', [ShipmentsController::class, 'getShipmentByToken']);
+
+// Define a route to fetch shipment logs by token
+Route::get('/api/shipment-logs/{token}', [LogsController::class, 'getShipmentByToken']);
 
 // Route to fetch statuses
 Route::get('/api/statuses', [StatusesController::class, 'index']);
