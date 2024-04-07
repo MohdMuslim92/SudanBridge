@@ -162,6 +162,16 @@ class ShipmentsController extends Controller
 
         $shipment->save();
 
+        // Find the shipment by id
+        $createdShipment = Shipment::with('user', 'item', 'sender', 'recipient')->findOrFail($shipment->id);
+
+        // Convert the shipment and its related data to JSON
+        $oldData = $createdShipment->toJson();
+        $newData = $createdShipment->toJson();
+
+        // Create log
+        $shipment->createLog($shipment->id, $shipment->tracking_token, auth()->id(), 'create', $oldData, $newData);
+
         // Send email to the sender
         Mail::to($validatedData['senderEmail'])->send(new ShipmentCreated($shipment));
         // Send email to the recipient
@@ -171,7 +181,9 @@ class ShipmentsController extends Controller
     public function update(Request $request, $id)
     {
         // Find the shipment by id
-        $shipment = Shipment::findOrFail($id);
+        $shipment = Shipment::with('user', 'item', 'sender', 'recipient')->findOrFail($id);
+
+        $oldData = $shipment->toJson(); // Capture current data before update
 
         // Validate incoming request data
         $validatedData = $request->validate([
@@ -230,6 +242,16 @@ class ShipmentsController extends Controller
             'locality_id' => $validatedData['recipient']['address']['locality_id'],
             'details' => $validatedData['recipient']['address']['details'],
         ]);
+
+        // Refresh the shipment to get the latest data from the database
+        $shipment->refresh();
+
+        // Convert the refreshed shipment and its related data to JSON
+        $newData = $shipment->toJson();
+
+        // Create log
+        $shipment->createLog($shipment->id, $shipment->tracking_token, auth()->id(), 'update', $oldData, $newData);
+
 
         // Return a response
         return response()->json(['message' => 'Shipment updated successfully'], 200);
@@ -351,7 +373,14 @@ class ShipmentsController extends Controller
     public function destroy($id)
     {
         // Find the shipment by id
-        $shipment = Shipment::findOrFail($id);
+        $shipment = Shipment::with('user', 'item', 'sender', 'recipient')->findOrFail($id);
+
+        // Convert the shipment and its related data to JSON
+        $oldData = $shipment->toJson();
+        $newData = $shipment->toJson();
+
+        // Create log
+        $shipment->createLog($shipment->id, $shipment->tracking_token, auth()->id(), 'delete', $oldData, $newData);
 
         // Delete the shipment
         $shipment->delete();
