@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ShipmentLog extends Model
+class Log extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'shipment_id',
         'token',
-        'user_id',
         'action',
         'old_data',
         'new_data'
