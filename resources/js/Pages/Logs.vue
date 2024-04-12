@@ -53,6 +53,28 @@ function getBackgroundColor(action) {
     }
 }
 
+// Function to parse user data from JSON
+function parseUserData(userData) {
+    if (!userData) {
+        return { name: 'Deleted by same user', email: 'Deleted by same user', error: true };
+    }
+
+    if (typeof userData === 'string') {
+        try {
+            const user = JSON.parse(userData);
+            return { name: user.name, email: user.email,  phone: user.phone, error: false };
+        } catch (error) {
+            alert('Error parsing user data:', error);
+            return { name: '', email: '', phone: '', error: true };
+        }
+    } else if (typeof userData === 'object') {
+        return { name: userData.name || '', email: userData.email || '', phone: userData.phone || '', error: false };
+    } else {
+        alert('Invalid user data format:', userData);
+        return { name: '', email: '', phone: '', error: true };
+    }
+}
+
 </script>
 
 <template>
@@ -142,21 +164,21 @@ function getBackgroundColor(action) {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="sticky left-0 z-10 bg-blue-300">User Name</td>
+                                    <td class="sticky left-0 z-10 bg-blue-300">Officer Name</td>
                                     <td v-for="log in shipments.shipment_logs" :key="log.id" :style="{ backgroundColor: log.old_data && log.new_data && JSON.parse(log.old_data).user && JSON.parse(log.new_data).user && JSON.parse(log.old_data).user.name !== JSON.parse(log.new_data).user.name ? getBackgroundColor(log.action) : '' }">
-                                        {{ log.new_data && JSON.parse(log.new_data).user ? JSON.parse(log.new_data).user.name : '' }}
+                                        {{ parseUserData(log.user).name }}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="sticky left-0 z-10 bg-blue-300">User Email</td>
+                                    <td class="sticky left-0 z-10 bg-blue-300">Officer Email</td>
                                     <td v-for="log in shipments.shipment_logs" :key="log.id" :style="{ backgroundColor: log.old_data && log.new_data && JSON.parse(log.old_data).user && JSON.parse(log.new_data).user && JSON.parse(log.old_data).user.email !== JSON.parse(log.new_data).user.email ? getBackgroundColor(log.action) : '' }">
-                                        {{ log.new_data && JSON.parse(log.new_data).user ? JSON.parse(log.new_data).user.email : '' }}
+                                        {{ parseUserData(log.user).email }}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="sticky left-0 z-10 bg-blue-300">User Phone</td>
+                                    <td class="sticky left-0 z-10 bg-blue-300">Officer Phone</td>
                                     <td v-for="log in shipments.shipment_logs" :key="log.id" :style="{ backgroundColor: log.old_data && log.new_data && JSON.parse(log.old_data).user && JSON.parse(log.new_data).user && JSON.parse(log.old_data).user.phone !== JSON.parse(log.new_data).user.phone ? getBackgroundColor(log.action) : '' }">
-                                        {{ log.new_data && JSON.parse(log.new_data).user ? JSON.parse(log.new_data).user.phone : '' }}
+                                        {{ parseUserData(log.user).phone }}
                                     </td>
                                 </tr>
                                 </tbody>

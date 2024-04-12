@@ -17,6 +17,7 @@ use App\Http\Controllers\FAQsController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StateController;
+use App\Http\Controllers\RoleController;
 
 
 /*
@@ -66,6 +67,9 @@ Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
 // Route to display the logs page
 Route::middleware('auth')->group(function () {
     Route::get('/logs', [LogsController::class, 'index'])->name('logs');
+    Route::get('/Users-Log', [LogsController::class, 'UsersLogDisplay'])->name('userslog');
+    // Define a route to fetch shipment logs by token
+    Route::get('/api/get-users-log', [LogsController::class, 'getUsersLog']);
 });
 
 // Route to display the About page
@@ -87,8 +91,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/dashboard/data', [DashboardController::class, 'data']);
-Route::post('/dashboard/update/{userId}', [DashboardController::class, 'updateUserRole']);
-Route::post('/dashboard/updateFacility/{userId}', [DashboardController::class, 'updateFacility']);
+Route::post('/dashboard/update/role/{userId}', [RoleController::class, 'updateUserRole']);
+Route::post('/dashboard/updateFacility/{userId}', [FacilityController::class, 'updateFacility']);
 
 // Route to fetch all states
 Route::get('/api/states', [StateController::class, 'index']);

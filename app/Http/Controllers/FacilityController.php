@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Facility;
 use Illuminate\Support\Facades\Auth;
@@ -65,6 +66,33 @@ class FacilityController extends Controller
 
         return redirect()->back()->with('success', 'Facility updated successfully.');
     }
+
+    public function updateFacility(Request $request, $userId)
+    {
+        // Get the current user ID
+        $updatedBy = $request->user()->id;
+
+        // Retrieve the created user with its related facility and role
+        $user = User::with('role', 'facility')->findOrFail($userId);
+
+        // Convert the user and its related data to JSON
+        $oldData = $user->toJson();
+        $user->update(['facility_id' => $request->facility_id]);
+
+        // Refresh the user to get the latest data from the database
+        $user->refresh();
+
+        // Convert the user and its related data to JSON
+        $newData = $user->toJson();
+
+        // Create log
+        $user->createLog($updatedBy, null, 'None', 'user-update', $oldData, $newData);
+
+        return response()->json(['message' => 'Facility updated successfully']);
+
+
+    }
+
 
     public function destroy(Facility $facility)
     {

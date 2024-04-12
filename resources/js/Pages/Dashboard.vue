@@ -24,7 +24,7 @@ onMounted(async () => {
         roles.value = response.data.roles;
         facilities.value = response.data.facilities;
     } catch (error) {
-        console.error('Error fetching data:', error);
+        alert('Error fetching data:', error);
     }
 
     // Set selectedRole for each user if user.role_id is not null
@@ -44,7 +44,7 @@ onMounted(async () => {
 
 const updateUserRole = async (userId, roleId) => {
     try {
-        await axios.post(`/dashboard/update/${userId}`, { role_id: roleId });
+        await axios.post(`/dashboard/update/role/${userId}`, { role_id: roleId });
         // Show notification
         notification.value.message = 'Role updated successfully';
         notification.value.visible = true;
@@ -61,13 +61,12 @@ const updateUserRole = async (userId, roleId) => {
         const response = await axios.get('/dashboard/data');
         users.value = response.data.users;
     } catch (error) {
-        console.error('Error updating user role:', error);
+        alert('Error updating user role:', error);
     }
 };
 
 const updateFacility = async (userId, facilityId) => {
     try {
-        console.log(userId);
         await axios.post(`/dashboard/updateFacility/${userId}`, { facility_id: facilityId });
         // Show notification
         notification.value.message = 'Facility updated successfully';
@@ -85,7 +84,7 @@ const updateFacility = async (userId, facilityId) => {
         const response = await axios.get('/dashboard/data');
         users.value = response.data.users;
     } catch (error) {
-        console.error('Error updating user facility:', error);
+        alert('Error updating user facility:', error);
     }
 };
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Address;
 use App\Models\Item;
@@ -170,7 +171,7 @@ class ShipmentsController extends Controller
         $newData = $createdShipment->toJson();
 
         // Create log
-        $shipment->createLog($shipment->id, $shipment->tracking_token, auth()->id(), 'create', $oldData, $newData);
+        $shipment->createLog($userId, $shipment->id, $shipment->tracking_token, 'create', $oldData, $newData);
 
         // Send email to the sender
         Mail::to($validatedData['senderEmail'])->send(new ShipmentCreated($shipment));
@@ -249,8 +250,11 @@ class ShipmentsController extends Controller
         // Convert the refreshed shipment and its related data to JSON
         $newData = $shipment->toJson();
 
+        // Get the current user ID
+        $userId = $request->user()->id;
+
         // Create log
-        $shipment->createLog($shipment->id, $shipment->tracking_token, auth()->id(), 'update', $oldData, $newData);
+        $shipment->createLog($userId, $shipment->id, $shipment->tracking_token, 'update', $oldData, $newData);
 
 
         // Return a response
@@ -379,8 +383,11 @@ class ShipmentsController extends Controller
         $oldData = $shipment->toJson();
         $newData = $shipment->toJson();
 
+        // Get the current user ID
+        $userId = $request->user()->id;
+
         // Create log
-        $shipment->createLog($shipment->id, $shipment->tracking_token, auth()->id(), 'delete', $oldData, $newData);
+        $shipment->createLog($userId, $shipment->id, $shipment->tracking_token, 'delete', $oldData, $newData);
 
         // Delete the shipment
         $shipment->delete();
