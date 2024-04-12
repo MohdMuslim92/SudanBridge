@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Address;
 use App\Models\Item;
@@ -20,7 +19,7 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 
 class ShipmentsController extends Controller
 {
@@ -374,7 +373,7 @@ class ShipmentsController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         // Find the shipment by id
         $shipment = Shipment::with('user', 'item', 'sender', 'recipient')->findOrFail($id);
@@ -385,6 +384,14 @@ class ShipmentsController extends Controller
 
         // Get the current user ID
         $userId = $request->user()->id;
+
+        // Get the path of the QR code image
+        $qrCodeImagePath = public_path($shipment->qr_code_image);
+
+        // Check if the QR code image file exists, then delete it
+        if (File::exists($qrCodeImagePath)) {
+            File::delete($qrCodeImagePath);
+        }
 
         // Create log
         $shipment->createLog($userId, $shipment->id, $shipment->tracking_token, 'delete', $oldData, $newData);
