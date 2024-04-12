@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,6 +32,10 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
+
+        // Fetch the old user data before updating
+        $oldUser = $user->load('role', 'facility');
+
         $user->fill([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
@@ -38,11 +43,22 @@ class ProfileController extends Controller
         ]);
         $request->user()->fill($request->validated());
 
+        // Clear email verification if the email has changed
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
         $request->user()->save();
+
+        // Fetch the new user data after updating
+        $newUser = $user->refresh();
+
+        // Convert the user and its related data to JSON
+        $oldData = $oldUser->toJson();
+        $newData = $newUser->toJson();
+
+        // Create log
+        $user->createLog($user->id, null, 'None', 'user-update', $oldData, $newData);
 
         return Redirect::route('profile.edit');
     }
@@ -58,9 +74,22 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // Get the user ID
+        $userId = $user->id;
+
+        // Fetch the user data before deletion
+        $oldUser = $user->load('role', 'facility');
+
         Auth::logout();
 
         $user->delete();
+
+        // Convert the user and its related data to JSON
+        $oldData = $oldUser->toJson();
+        // Since the user is deleted, there's no new data
+
+        // Log the deletion
+        $user->createLog(null, null, 'None', 'user-delete', $oldData, $oldData);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
