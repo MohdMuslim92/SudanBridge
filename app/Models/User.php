@@ -55,4 +55,16 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Facility::class);
     }
+
+    public function createLog($userId, $shipmentId, $shipmentToken, $action, $oldData, $newData) {
+        Logs::create([
+            'user_id' => $userId,
+            'shipment_id' => $shipmentId,
+            'token' => $shipmentToken,
+            'action' => $action,
+            'old_data' => $oldData,
+            'new_data' => $newData,
+        ]);
+    }
+
 }
