@@ -88,14 +88,14 @@ class Shipment extends Model
     }
 
     public function logs() {
-        return $this->hasMany(ShipmentLog::class);
+        return $this->hasMany(Logs::class);
     }
 
-    public function createLog($shipmentId, $shipmentToken, $userId, $action, $oldData, $newData) {
+    public function createLog($userId, $shipmentId, $shipmentToken, $action, $oldData, $newData) {
         $this->logs()->create([
+            'user_id' => $userId,
             'shipment_id' => $shipmentId,
             'token' => $shipmentToken,
-            'user_id' => $userId,
             'action' => $action,
             'old_data' => $oldData,
             'new_data' => $newData,
