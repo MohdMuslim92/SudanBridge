@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shipment_logs', function (Blueprint $table) {
+        Schema::create('logs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('shipment_id')->nullable();
             $table->string('token');
             $table->string('action'); // e.g., update, delete
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->json('new_data')->nullable(); // Store new data as JSON
             $table->timestamps();
 
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('shipment_id')->references('id')->on('shipments')->onDelete('set null');
         });
     }
