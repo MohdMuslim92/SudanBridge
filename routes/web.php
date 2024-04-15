@@ -119,6 +119,9 @@ Route::get('/api/shipments', [ShipmentsController::class, 'index']);
 // Define a route to fetch shipment details by token
 Route::get('/api/shipments/{token}', [ShipmentsController::class, 'getShipmentByToken']);
 
+// Define a route to fetch deleted shipment logs
+Route::get('/api/deleted-shipment-logs', [LogsController::class, 'deletedShipments']);
+
 // Define a route to fetch shipment logs by token
 Route::get('/api/shipment-logs/{token}', [LogsController::class, 'getShipmentByToken']);
 
