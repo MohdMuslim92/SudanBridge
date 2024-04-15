@@ -36,6 +36,13 @@ class LogsController extends Controller
         }
     }
 
+    public function deletedShipments(Request $request)
+    {
+        // Fetch shipment logs where action is 'delete'
+        $deletedShipmentsLog = Logs::where('action', 'delete')->get();
+
+        return response()->json(['deleted_shipments_log' => $deletedShipmentsLog]);
+    }
     public function getUsersLog(Request $request)
     {
         try {
