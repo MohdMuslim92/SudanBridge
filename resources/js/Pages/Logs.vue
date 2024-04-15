@@ -7,6 +7,20 @@ import Footer from './footer.vue';
 
 const token = ref('');
 const shipments = ref('');
+const deletedShipments = ref('');
+
+const fetchShipmentLogs = async () => {
+    try {
+        const response = await axios.get(`/api/deleted-shipment-logs?filter=delete`);
+        deletedShipments.value = response.data;
+    } catch (error) {
+        alert('Failed to fetch deleted shipments log');
+    }
+}
+
+onMounted(async () => {
+    await fetchShipmentLogs();
+});
 
 const searchByToken = async () => {
     try {
@@ -98,6 +112,62 @@ function parseUserData(userData) {
                         <button @click="searchByToken" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Get Logs</button>
                     </div>
                 </div>
+
+                <tr>
+                    <td class="sticky left-0 z-10 bg-blue-300 border-r border-gray-200">Deleted Shipment</td>
+                    <template v-for="log in deletedShipments.deleted_shipments_log" :key="log.id">
+                        <td class="border-r border-gray-200">
+                            <template v-if="log.action === 'delete'">
+                                <div class="info">{{ log.token }}</div>
+                            </template>
+                        </td>
+                    </template>
+                </tr>
+
+                <tr>
+                    <td class="sticky left-0 z-10 bg-blue-300 border-r border-gray-200">Sender Name</td>
+                    <template v-for="log in deletedShipments.deleted_shipments_log" :key="log.id">
+                        <td class="border-r border-gray-200">
+                            <template v-if="log.action === 'delete' && log.new_data && log.new_data">
+                                <div class="info">{{ JSON.parse(log.new_data).sender.name }}</div>
+                            </template>
+                        </td>
+                    </template>
+                </tr>
+
+                <tr>
+                    <td class="sticky left-0 z-10 bg-blue-300 border-r border-gray-200">Sender Phone</td>
+                    <template v-for="log in deletedShipments.deleted_shipments_log" :key="log.id">
+                        <td class="border-r border-gray-200">
+                            <template v-if="log.action === 'delete' && log.new_data && log.new_data">
+                                <div class="info">{{ JSON.parse(log.new_data).sender.phone }}</div>
+                            </template>
+                        </td>
+                    </template>
+                </tr>
+
+                <tr>
+                    <td class="sticky left-0 z-10 bg-blue-300 border-r border-gray-200">Recipient Name</td>
+                    <template v-for="log in deletedShipments.deleted_shipments_log" :key="log.id">
+                        <td class="border-r border-gray-200">
+                            <template v-if="log.action === 'delete' && log.new_data && log.new_data">
+                                <div class="info">{{ JSON.parse(log.new_data).recipient.name }}</div>
+                            </template>
+                        </td>
+                    </template>
+                </tr>
+
+                <tr>
+                    <td class="sticky left-0 z-10 bg-blue-300 border-r border-gray-200">Recipient Phone</td>
+                    <template v-for="log in deletedShipments.deleted_shipments_log" :key="log.id">
+                        <td class="border-r border-gray-200">
+                            <template v-if="log.action === 'delete' && log.new_data && log.new_data">
+                                <div class="info">{{ JSON.parse(log.new_data).recipient.phone }}</div>
+                            </template>
+                        </td>
+                    </template>
+                </tr>
+
                 <div v-if="shipments">
                     <!-- Loop through shipment logs and display each entry -->
                     <div class="max-w-3xl w-full bg-white rounded-lg shadow-md overflow-hidden">
@@ -193,6 +263,21 @@ function parseUserData(userData) {
 </template>
 
 <style>
+.sticky {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: #90CDF4;
+}
+
+.border-r {
+    border-right: 1px solid #E5E7EB;
+}
+
+.info {
+    padding: 8px;
+}
+
 .styled-table {
     width: 100%;
     border-collapse: collapse;
