@@ -172,10 +172,19 @@ class ShipmentsController extends Controller
         // Create log
         $shipment->createLog($userId, $shipment->id, $shipment->tracking_token, 'create', $oldData, $newData);
 
-        // Send email to the sender
-        Mail::to($validatedData['senderEmail'])->send(new ShipmentCreated($shipment));
-        // Send email to the recipient
-        Mail::to($validatedData['recipientEmail'])->send(new ShipmentCreatedForRecipient($shipment));
+        try {
+            // Send email to the sender
+            Mail::to($validatedData['senderEmail'])->send(new ShipmentCreated($shipment));
+            // Send email to the recipient
+            Mail::to($validatedData['recipientEmail'])->send(new ShipmentCreatedForRecipient($shipment));
+        } catch (\Exception $e) {
+            // Log the error without displaying it to the user
+            \Log::error('Failed to send email for shipment creation: ' . $e->getMessage());
+        }
+
+        // Return a success response
+        return response()->json(['message' => 'Shipment created successfully'], 200);
+
     }
 
     public function update(Request $request, $id)
