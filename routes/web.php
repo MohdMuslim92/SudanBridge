@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StateController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\OnHoldController;
 
 
 /*
@@ -93,6 +94,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/dashboard/data', [DashboardController::class, 'data']);
 Route::post('/dashboard/update/role/{userId}', [RoleController::class, 'updateUserRole']);
 Route::post('/dashboard/updateFacility/{userId}', [FacilityController::class, 'updateFacility']);
+Route::post('/dashboard/updateUserStatus/{userId}', [StatusesController::class, 'updateUserStatus']);
 
 // Route to fetch all states
 Route::get('/api/states', [StateController::class, 'index']);
@@ -135,6 +137,12 @@ Route::get('/api/cities', [CitiesController::class, 'index']);
 Route::middleware('auth')->group(function () {
     Route::get('/api/facilities', [FacilityController::class, 'index']);
     Route::get('/api/location', [FacilityController::class, 'getLocation']);
+});
+
+// Route to display on hold page
+Route::middleware('auth')->group(function () {
+    Route::get('/on-hold', [OnHoldController::class, 'index'])->name('on-hold');
+    Route::get('/on-hold-status', [OnHoldController::class, 'getUserStatus']);
 });
 
 require __DIR__.'/auth.php';

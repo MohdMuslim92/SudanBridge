@@ -1,15 +1,17 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import Footer from "@/Pages/footer.vue";
 
 const users = ref([]);
 const roles = ref([]);
 const facilities = ref([]);
+const userStatuses = ref([]);
 const selectedRole = ref({});
 const selectedFacility = ref({});
+const selectedUserStatus = ref({});
 const notification = ref({
     visible: false,
     message: '',
@@ -23,6 +25,7 @@ onMounted(async () => {
         users.value = response.data.users;
         roles.value = response.data.roles;
         facilities.value = response.data.facilities;
+        userStatuses.value = response.data.userStatuses;
     } catch (error) {
         alert('Error fetching data:', error);
     }
@@ -38,6 +41,13 @@ onMounted(async () => {
     users.value.forEach(user => {
         if (user.facility_id !== null) {
             selectedFacility.value[user.id] = user.facility_id;
+        }
+    });
+
+// Set selectedUserStatus for each user if user.user_status_id is not null
+    users.value.forEach(user => {
+        if (user.user_status_id !== null) {
+            selectedUserStatus.value[user.id] = user.user_status_id;
         }
     });
 });
@@ -88,6 +98,38 @@ const updateFacility = async (userId, facilityId) => {
     }
 };
 
+const updateUserStatus = async (userId, userStatusId) => {
+    try {
+        await axios.post(`/dashboard/updateUserStatus/${userId}`, { user_status_id: userStatusId });
+        // Show notification
+        notification.value.message = 'User Status updated successfully';
+        notification.value.visible = true;
+        // Start timer to hide notification after 5 seconds
+        notificationTimer = 100;
+        const interval = setInterval(() => {
+            notificationTimer -= 1; // Decrease the width more gradually
+            if (notificationTimer <= 0) {
+                clearInterval(interval); // Clear the interval when the timer reaches 0
+                notification.value.visible = false; // Hide the notification
+            }
+        }, 50); // Update the timer every 50 milliseconds
+        // Refresh data after updating user role
+        const response = await axios.get('/dashboard/data');
+        users.value = response.data.users;
+    } catch (error) {
+        alert('Error updating user facility:', error);
+    }
+};
+
+const filteredUserStatuses = (user) => {
+    // Filter out "Pending" status if user status is not equal to 1
+    if (user.user_status_id !== 1) {
+        return userStatuses.value.filter(status => status.id !== 1);
+    } else {
+        return userStatuses.value;
+    }
+};
+
 </script>
 
 <template>
@@ -116,7 +158,7 @@ const updateFacility = async (userId, facilityId) => {
                         </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                        <tr class="table-row" v-for="user in users" :key="user.id">
+                        <tr class="table-row" v-for="user in users" :key="user.id" :class="{ 'bg-pending': user.user_status_id === 1 }">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
                             </td>
@@ -134,6 +176,14 @@ const updateFacility = async (userId, facilityId) => {
                                         <option v-for="facility in facilities" :key="facility.id" :value="facility.id">{{ facility.name }} - {{ facility.location }}</option>
                                     </select>
                                     <button @click="updateFacility(user.id, selectedFacility[user.id])" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-md hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Change</button>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <select v-model="selectedUserStatus[user.id]" class="mr-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                        <option v-for="userStatus in filteredUserStatuses(user)" :key="userStatus.id" :value="userStatus.id">{{ userStatus.name }}</option>
+                                    </select>
+                                    <button @click="updateUserStatus(user.id, selectedUserStatus[user.id])" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-md hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-50">Change</button>
                                 </div>
                             </td>
                         </tr>
@@ -175,6 +225,10 @@ const updateFacility = async (userId, facilityId) => {
 /* Color Scheme */
 .bg-blue-600 {
     background-color: #3b82f6;
+}
+
+.bg-pending {
+    background-color: #FFD700; /* color user with pending status */
 }
 
 /* Typography */

@@ -24,6 +24,7 @@ class User extends Authenticatable
         'phone',
         'role_id',
         'facility_id',
+        'user_status_id',
     ];
 
     /**
@@ -54,6 +55,11 @@ class User extends Authenticatable
     public function facility()
     {
         return $this->belongsTo(Facility::class);
+    }
+
+    public function userStatus()
+    {
+        return $this->belongsTo(UserStatus::class);
     }
 
     public function createLog($userId, $shipmentId, $shipmentToken, $action, $oldData, $newData) {

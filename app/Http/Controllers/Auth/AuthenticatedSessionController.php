@@ -41,7 +41,12 @@ class AuthenticatedSessionController extends Controller
             // If role_id is 1 (admin), redirect to the admin dashboard
             return redirect()->route('dashboard');
         } elseif ($user->role_id === 2) {
-            // If role_id is 2 (user), redirect to the user dashboard
+            if ($user->user_status_id !== 2) {
+                // If user status is not active redirect to the on hold page
+                return redirect()->route('on-hold');
+            }
+
+                // If role_id is 2 (user), redirect to the user dashboard
             return redirect()->route('user.dashboard');
         }
         return redirect()->intended(RouteServiceProvider::HOME);
